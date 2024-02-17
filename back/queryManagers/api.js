@@ -66,6 +66,7 @@ async function manageRequest(request, response) {
                     //saveToken(data.email, data.username, data.password, token);
 
                     response.writeHead(200, { 'Content-Type': 'application/json' });
+                    response.json({ token });
                     response.end(JSON.stringify({ message: 'Inscription réussie', token }));
                 }
 

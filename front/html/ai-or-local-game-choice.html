@@ -1,10 +1,37 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>$Title$</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quortnite - Accueil</title>
+  <link rel="stylesheet" href="../css/ai-or-local-game-choice.html.css">
 </head>
 <body>
-$END$
+<div class="container">
+
+
+  <div class="menu">
+
+    <button class="btn" id="playLocal">
+      <span>LOCAL</span>
+      <script>
+        document.getElementById('playLocal').addEventListener('click', function() {
+          window.location.href = 'game.html';
+        });
+      </script>
+    </button>
+
+    <button class="btn" id="playAi">
+      <span>IA</span>
+      <script>
+        document.getElementById('playAi').addEventListener('click', function() {
+          window.location.href = 'game.html';
+        });
+      </script>
+    </button>
+
+
+  </div>
+</div>
 </body>
 </html>

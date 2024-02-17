@@ -2,9 +2,39 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>$Title$</title>
+  <title>Socket.IO Test Client</title>
+  <script src="https://cdn.socket.io/4.0.1/socket.io.js"></script>
+  <script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', function () {
+      // Remplacez 'http://localhost:8000' par l'adresse de votre serveur si différente
+      const socket = io('http://localhost:8000/api/game', {
+        auth: {
+          token: "votre_jwt_token_ici"
+        }
+      });
+
+      socket.on('connect', () => {
+        console.log('Connected to /api/game');
+        socket.emit('setup', { AIplays: 1 });
+        socket.emit('newMove', { move: "exampleMove" });
+      });
+
+      socket.on('updatedBoard', (data) => {
+        console.log('Board Updated: ', data);
+      });
+
+      socket.on('disconnect', () => {
+        console.log('Disconnected from /api/game');
+      });
+
+      socket.on('connect_error', (err) => {
+        console.log('Connection Error: ', err.message);
+      });
+    });
+  </script>
 </head>
 <body>
-$END$
+<h2>Socket.IO Test Client</h2>
+<p>Check the console for messages.</p>
 </body>
 </html>
