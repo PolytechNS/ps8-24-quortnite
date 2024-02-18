@@ -36,7 +36,7 @@ async function simulateGame() {
             console.log("Vos murs:", gameState.ownWalls);
 
             // Obtenir et appliquer le prochain mouvement de l'IA
-            const move = await nextMove(gameState);
+            const move = await nextMove(gameState,player);
             console.log("Mouvement choisi:", move);
 
             // Appliquer le mouvement à l'état du jeu
