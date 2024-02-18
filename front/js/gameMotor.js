@@ -415,11 +415,22 @@ function getValidMoves(position) {
     const col = position % 17;
     const moves = [];
     const otherPlayerPosition = currentPlayer === 'player1' ? player2Position : player1Position;
-    // Déplacements horizontaux et verticaux
-    if (row > 1 && !isWallBetweenPositions(position, position - 34) && (position-34!==otherPlayerPosition)) moves.push(position - 34);
-    if (row < 15 && !isWallBetweenPositions(position, position + 34) && (position + 34 !== otherPlayerPosition)) moves.push(position + 34);
-    if (col > 1 && !isWallBetweenPositions(position, position - 2) && (position - 2 !== otherPlayerPosition)) moves.push(position - 2);
-    if (col < 15 && !isWallBetweenPositions(position, position + 2) && (position + 2 !== otherPlayerPosition)) moves.push(position + 2);
+    const directions = [-17, 17, -1, 1];
+
+    directions.forEach(direction => {
+        const newPosition = position + direction;
+        const newRow = Math.floor(newPosition / 17);
+        const newCol = newPosition % 17;
+
+        // Vérifier si le mouvement reste dans les limites du plateau
+        if (newRow >= 0 && newRow < 17 && newCol >= 0 && newCol < 17) {
+            // Vérifier s'il y a un mur entre la position actuelle et la nouvelle position
+            if (!isWallBetweenPositions(position, newPosition)) {
+                moves.push(newPosition);
+            }
+        }
+    });
+
     return moves;
 }
 
@@ -680,24 +691,60 @@ function handleWallClick(cellIndex, wallType) {
 }
 
 function canPlaceWall(cellIndex, wallType) {
-    // Ajoutez votre logique pour vérifier si le mur peut être placé
-    // Retournez true si le mur peut être placé, sinon false
-    // Vous devez vous assurer que le mur ne chevauche pas d'autres murs
-    // et qu'il respecte les règles du jeu Qoridor.
-    // Vous pouvez utiliser la position actuelle des joueurs et les indices des murs.
-    // Exemple : vérifiez si le mur chevauche d'autres murs ou s'il bloque le chemin d'un joueur.
-    if (cells[cellIndex].classList.contains('wall')) {
+    // Sauvegarde de l'état actuel des murs avant de tester la pose du mur
+    const originalWallsState = {...wallsState};
+    // Simuler la pose du mur
+    wallsState[cellIndex] = wallType;
+
+    // Vérifier si les deux joueurs ont toujours un chemin vers leur ligne d'arrivée
+    const player1HasPath = checkPathExistsForPlayer('player1');
+    const player2HasPath = checkPathExistsForPlayer('player2');
+
+    // Restaurer l'état original des murs après le test
+    wallsState = originalWallsState;
+
+    // Le mur peut être placé uniquement si les deux joueurs ont un chemin
+    return player1HasPath && player2HasPath;
+
+}
+
+function checkPathExistsForPlayer(player) {
+    // Déterminer la position de départ et la ligne d'arrivée pour le joueur
+    const startPosition = player === 'player1' ? player1Position : player2Position;
+    const endRow = player === 'player1' ? 16 : 0;
+
+    // Utiliser BFS ou DFS pour vérifier si un chemin existe
+    // Cette fonction doit être implémentée
+    return pathExists(startPosition, endRow);
+}
+
+function pathExists(startPosition, endRow) {
+    let visited = new Set(); // Ensemble pour garder une trace des cellules visitées
+
+    function dfs(position) {
+        // Convertir l'indice de position en coordonnées de grille
+        let row = Math.floor(position / 17);
+        // Si la ligne d'arrivée est atteinte
+        if (row === endRow) return true;
+
+        // Marquer la cellule actuelle comme visitée
+        visited.add(position);
+
+        // Obtenir les mouvements valides à partir de la position actuelle
+        let validMoves = getValidMoves(position);
+        for (let nextPosition of validMoves) {
+            if (!visited.has(nextPosition)) {
+                // Si le chemin existe à partir de nextPosition, retourner true
+                if (dfs(nextPosition)) return true;
+            }
+        }
+
+        // Aucun chemin trouvé à partir de cette position
         return false;
     }
 
-    let row = Math.floor(cellIndex / 17);
-    let col = cellIndex % 17;
-    if (row % 2 !== 0 && col % 2 !== 0) {
-        return false;
-    }
-
-    // Placeholder, veuillez mettre en œuvre votre propre logique
-    return true;
+    // Lancer la DFS à partir de la position de départ
+    return dfs(startPosition);
 }
 
 
@@ -851,39 +898,32 @@ function applyVisibilityChange(cellIndex, visibilityChange) {
 
 
 function isWallBetweenPositions(startIndex, endIndex) {
+    // Convertir les indices en coordonnées de grille
     const startRow = Math.floor(startIndex / 17);
     const startCol = startIndex % 17;
     const endRow = Math.floor(endIndex / 17);
     const endCol = endIndex % 17;
 
-    // Vérifier s'il y a un mur entre les positions horizontalement
-    if (startRow === endRow) {
-        const minCol = Math.min(startCol, endCol);
-        const maxCol = Math.max(startCol, endCol);
-        for (let col = minCol + 1; col < maxCol; col++) {
-            const index = startRow * 17 + col;
-            if (cells[index] && cells[index].classList.contains('wall')) {
-                return true;
-            }
-        }
+    // Calculer la différence entre les positions de départ et de fin
+    const rowDiff = endRow - startRow;
+    const colDiff = endCol - startCol;
+
+    // Déterminer le type de mur à vérifier (horizontal ou vertical)
+    let wallIndex, wallType;
+    if (rowDiff === 0) {
+        wallIndex = Math.min(startIndex, endIndex);
+        wallType = 'column';
+    } else if (colDiff === 0) {
+        wallIndex = Math.min(startIndex, endIndex);
+        wallType = 'row';
+    } else {
+        // Les positions ne sont pas adjacentes ou sont diagonales
+        return true; // Supposer qu'il y a un mur pour éviter un mouvement invalide
     }
 
-    // Vérifier s'il y a un mur entre les positions verticalement
-    if (startCol === endCol) {
-        const minRow = Math.min(startRow, endRow);
-        const maxRow = Math.max(startRow, endRow);
-        for (let row = minRow + 1; row < maxRow; row++) {
-            const index = row * 17 + startCol;
-            if (cells[index] && cells[index].classList.contains('wall')) {
-                return true;
-            }
-        }
-    }
-
-    return false;
-
+    // Vérifier si un mur est placé entre les positions
+    return wallsState[wallIndex] === wallType;
 }
-
 
 function openAntiCheatPage() {
     const antiCheatUrl = 'anti-cheat-sheet.html';
