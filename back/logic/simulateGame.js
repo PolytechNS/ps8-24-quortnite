@@ -35,8 +35,8 @@ async function simulateGame() {
             console.log(`Tour du joueur ${player}:`);
 
             // Imprimer les listes des murs
-            console.log("Murs de l'opposant:", gameState.opponentWalls);
-            console.log("Vos murs:", gameState.ownWalls);
+            console.log("Murs du joueur 1 (Own Walls):", gameState.ownWalls);
+            console.log("Murs du joueur 2 (Opponent Walls):", gameState.opponentWalls);
 
             // Obtenir et appliquer le prochain mouvement de l'IA
             const move = await nextMove(gameState,player);
@@ -46,7 +46,20 @@ async function simulateGame() {
             // Cette partie doit être implémentée selon les règles de votre jeu
             // Mettre à jour gameState ici
 
-            applyMoveToBoard(player, move, gameState.board);
+            if (move.action === "wall") {
+                // Ajouter le mur à la liste appropriée
+                if (player === 1) {
+                    gameState.ownWalls.push(move.value);
+                } else {
+                    gameState.opponentWalls.push(move.value);
+                }
+
+            } else if (move.action === "move") {
+                // Appliquer le mouvement
+                applyMoveToBoard(player, move, gameState.board);
+            }
+
+
             await updateBoard(gameState);
 
             if (player === 2) {
@@ -84,8 +97,8 @@ function hasPlayerWon(player, board) {
 function applyMoveToBoard(player, move, board) {
     if (move.action === "move") {
         // Extraire les coordonnées de la valeur de mouvement
-        const x = parseInt(move.value[0], 10);
-        const y = parseInt(move.value[1], 10);
+        const x = parseInt(move.value[0], 10)-1;
+        const y = parseInt(move.value[1], 10)-1;
 
 
         // Effacer la position actuelle du joueur
@@ -103,7 +116,7 @@ function applyMoveToBoard(player, move, board) {
     }
     // Gérer ici d'autres types d'actions, comme "wall"
 }
-x
+
 
 // Fonction pour afficher l'état du plateau
 function printBoard(board) {

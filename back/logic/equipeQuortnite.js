@@ -1,12 +1,26 @@
 // equipeQuortnite.js
+
+
+// he gameState object has the following properties:
+//
+// opponentWalls: a list containing each of your opponent's walls (for each wall, the value is a list containing 2 elements --> a position string representing the top-left square that the wall is in contact with, and 0 if the wall is placed horizontally or1 if it is vertical).
+// ownWalls: a list containing each of your walls (the same way opponentWalls are defined).
+// board: a list containing 9 lists of length 9, for which board[i][j] represents the content of the cell (i+1, j+1) as defined in the rules. The value for each cell is an integer : -1 if you do not see the cell, 0 if you see the cell but it is empty, 1 if you are in the cell, 2 if your opponent is in the cell
+// The move object has the following properties:
+//
+// action: "move", "wall", or "idle" (note that "idle" can only be used when no legal action can be performed)
+// value (only if the action is not "idle"):
+// for the "move" action: a position string
+// for the "wall" action: a list containing 2 elements --> a position string representing the top-left square that the wall is in contact with, and an integer: 0 if the wall is placed horizontally or 1 if it is vertical.
+
 const setup = (AIplay) => {
     return new Promise((resolve, reject) => {
         setTimeout(() => {
             let positionInitiale;
             if (AIplay === 1) {
-                positionInitiale = "OO"; // Si l'IA est le premier joueur, la position initiale est A1
+                positionInitiale = "11"; // Si l'IA est le premier joueur, la position initiale est A1
             } else if (AIplay === 2) {
-                positionInitiale = "88"; // Si l'IA est le deuxième joueur, la position initiale est A9
+                positionInitiale = "19"; // Si l'IA est le deuxième joueur, la position initiale est A9
             } else {
                 reject(new Error("Valeur AIplay invalide"));
                 return;
@@ -21,47 +35,48 @@ const setup = (AIplay) => {
 
 
 
-const nextMove = (gameState, player) => {
+const nextMove = (gameState) => {
     return new Promise((resolve) => {
         setTimeout(() => {
-            const myPosition = findPlayerPosition(gameState, player);
-            const adversaryPosition = findPlayerPosition(gameState, player === 1 ? 2 : 1);
+            const myPosition = findPlayerPosition(gameState);
+            const adversaryPosition = findPlayerPosition(gameState);
             let move;
+
+
+            // Placement des murs verticaux en commençant du bas (pour le joueur 1) ou du haut (pour le joueur 2)
+            if (gameState.ownWalls.length < 4) {
+                let wallColumnIndex =1; // Ajustez selon la colonne de départ pour chaque joueur
+                let wallRowIndex = gameState.ownWalls.length * 2 + 1; // Assurez-vous que les murs sont placés verticalement l'un après l'autre
+
+                // Convertir les indices en position de mur au format "colonne-ligne"
+                let wallPosition = `${wallColumnIndex}${wallRowIndex}`;
+
+                resolve({ action: "wall", value: [wallPosition, 1] }); // 1 pour vertical
+                return;
+            }
+
 
 
 
             // Vérifier si le joueur 2 est juste en dessous de la ligne 5
-            const isPlayer2BelowLine5 = gameState.board[4].includes(-1);
-            console.log(isPlayer2BelowLine5);
-            let columnIndex = gameState.board[4].indexOf(-1);
-            console.log(columnIndex);
-
-            // S'il est temps de placer un mur horizontal
-            if (player === 1 && isPlayer2BelowLine5 && gameState.ownWalls.length < 10) {
-                console.log('wall');
-
-                // Trouver une position valide pour placer le mur
-                const wallPosition = findHorizontalWallPosition(gameState,4, columnIndex);
-
-                if (wallPosition) {
-                    resolve({ action: "wall", value: [wallPosition, 0] }); // 0 pour horizontal
-                    return;
-                }
-            }
-
-            // if (!myPosition) {
-            //     reject(new Error("Position du joueur non trouvée"));
-            //     return;
+            // const isPlayer2BelowLine5 = gameState.board[4].includes(-1);
+            // console.log(isPlayer2BelowLine5);
+            // let columnIndex = gameState.board[4].indexOf(-1);
+            // console.log(columnIndex);
+            //
+            // // S'il est temps de placer un mur horizontal
+            // if (player === 1 && isPlayer2BelowLine5 && gameState.ownWalls.length < 10) {
+            //     console.log('wall');
+            //
+            //     // Trouver une position valide pour placer le mur
+            //     const wallPosition = findHorizontalWallPosition(gameState,4, columnIndex);
+            //
+            //     if (wallPosition) {
+            //         resolve({ action: "wall", value: [wallPosition, 0] }); // 0 pour horizontal
+            //         return;
+            //     }
             // }
-            //
-            // let possibleMoves = findPossibleMoves(gameState,player);
-            // // Vérifier si la liste des mouvements possibles n'est pas vide
-            // if (possibleMoves.length > 0) {
-            //     // Sélectionner un mouvement aléatoire parmi les mouvements possibles
-            //     const randomIndex = Math.floor(Math.random() * possibleMoves.length);
-            //     const move = possibleMoves[randomIndex];
-            //
-            //     resolve(move);
+
 
 
 
@@ -81,7 +96,8 @@ const nextMove = (gameState, player) => {
 
 
             // Sinon, trouver le chemin le plus court vers la ligne d'arrivée
-            move = findShortestPathMove(gameState, player);
+            move = findShortestPathMove(gameState);
+
             if (move) {
                 resolve(move);
             } else {
@@ -94,9 +110,7 @@ const nextMove = (gameState, player) => {
     });
 };
 
-function isAdversaryInCenter(adversaryPosition) {
-    return adversaryPosition && adversaryPosition.x >= 3 && adversaryPosition.x <= 5 && adversaryPosition.y >= 3 && adversaryPosition.y <= 5;
-}
+
 
 
 
@@ -132,10 +146,10 @@ exports.updateBoard = updateBoard;
 
 
 
-function findPlayerPosition(gameState, player) {
+function findPlayerPosition(gameState) {
     for (let i = 0; i < gameState.board.length; i++) {
         for (let j = 0; j < gameState.board[i].length; j++) {
-            if (gameState.board[i][j] === player) {
+            if (gameState.board[i][j] === 1) {
                 return { x: i, y: j };
             }
         }
@@ -147,10 +161,10 @@ function findPlayerPosition(gameState, player) {
 
 
 
-const findPossibleMoves = (gameState,player) => {
+const findPossibleMoves = (gameState) => {
     let possibleMoves = [];
 
-    let myPosition = findPlayerPosition(gameState, player);
+    let myPosition = findPlayerPosition(gameState);
 
     if (!myPosition) return possibleMoves; // If AI's position is not found
 
@@ -214,11 +228,12 @@ function calculateWallPlacements(opponentPosition, ownWalls, board) {
 }
 
 
-function findShortestPathMove(gameState, player) {
-    const startPosition = findPlayerPosition(gameState, player);
+
+function findShortestPathMove(gameState) {
+    const startPosition = findPlayerPosition(gameState);
     if (!startPosition) return null;
 
-    const targetRow = player === 1 ? gameState.board.length - 1 : 0; // Inverser la ligne d'arrivée pour le joueur 2
+    const targetRow = player === 1 ? gameState.board.length - 1 : 0;
     let queue = [{ position: startPosition, path: [] }];
     let visited = new Set([`${startPosition.x},${startPosition.y}`]);
 
@@ -226,13 +241,20 @@ function findShortestPathMove(gameState, player) {
         let { position, path } = queue.shift();
 
         // Vérifier si la position actuelle est la ligne d'arrivée
-        if ((player === 1 && position.x === targetRow) || (player === 2 && position.x === targetRow)) {
+        if (position.x === targetRow) {
+            console.log
             if (path.length > 0) {
-                return path[0]; // Retourner le premier mouvement du chemin le plus court
+                // Conversion de la première étape du chemin en format "colonne-ligne"
+                const firstMove = path[0];
+                const moveCol = firstMove.value[1]; // Extraction de la colonne (y)
+                const moveRow = firstMove.value[0]; // Extraction de la ligne (x)
+                firstMove.value = `${moveCol}${moveRow}`; // Inversion pour le format "colonne-ligne"
+                return firstMove;
+            } else {
+                return { action: "idle" };
             }
         }
 
-        // Directions: Haut, Bas, Gauche, Droite
         const directions = [
             { dx: -1, dy: 0 }, // Haut
             { dx: 1, dy: 0 },  // Bas
@@ -246,53 +268,38 @@ function findShortestPathMove(gameState, player) {
 
             if (newX >= 0 && newX < gameState.board.length && newY >= 0 && newY < gameState.board[0].length && !visited.has(`${newX},${newY}`)) {
                 visited.add(`${newX},${newY}`);
-                queue.push({ position: { x: newX, y: newY }, path: [...path, { action: "move", value: `${newX}${newY}` }] });
+                // Ajout du mouvement en format "colonne-ligne" dans le chemin
+                const newMoveCol = newX +1;
+                const newMoveRow = newY +1;
+                queue.push({ position: { x: newX, y: newY }, path: [...path, { action: "move", value: `${newMoveCol}${newMoveRow}` }] }); // Inversion x et y pour format "colonne-ligne"
             }
         });
     }
 
-    return { action: "idle" }; // Retourner un mouvement "idle" si aucun chemin n'est trouvé
+    return { action: "idle" }; // Si aucun chemin n'est trouvé
 }
 
 
 
 
 
-// Trouver une position valide pour placer un mur horizontal juste au-dessus de la ligne donnée
-// function findHorizontalWallPosition(gameState, aboveRowIndex) {
-//     // Parcourir les colonnes de la ligne spécifiée
-//     for (let j = 0; j < gameState.board[aboveRowIndex].length - 1; j++) {
-//         // Vérifier si les deux cases consécutives sont vides sur la ligne spécifiée
-//         if (gameState.board[aboveRowIndex][j] === 0 && gameState.board[aboveRowIndex][j+1] === 0) {
-//             // Assurez-vous qu'aucun mur ne se trouve déjà à cette position et qu'il est légal de placer le mur
-//             const wallNotPresent = !gameState.ownWalls.concat(gameState.opponentWalls).some(wall => {
-//                 return wall[0] === `${aboveRowIndex}${j}` && wall[1] === 0;
-//             });
-//             if (wallNotPresent) {
-//                 // Retourner la position du mur sous la forme 'ij'
-//                 return `${aboveRowIndex}${j}`;
-//             }
-//         }
-//     }
-//     return null; // Retourner null si aucune position de mur n'est trouvée
-// }
+
 
 
 function findHorizontalWallPosition(gameState, aboveRowIndex, columnIndex) {
     // Assurez-vous que les indices sont dans les limites du tableau
     if (aboveRowIndex >= 0 && aboveRowIndex < gameState.board.length && columnIndex >= 0 && columnIndex < gameState.board[aboveRowIndex].length) {
-            // Vérifier qu'aucun mur n'existe déjà à cet emplacement
-        const positionStr = `${aboveRowIndex}${columnIndex-1}`;
+        const positionStr = `${columnIndex}${aboveRowIndex}`;
         const wallExists = gameState.ownWalls.concat(gameState.opponentWalls).some(wall => wall[0] === positionStr && wall[1] === 0);
-
         if (!wallExists) {
-            // La position du mur est valide
-            return positionStr;
 
+            return positionStr;
         }
     }
-    // Aucune position valide trouvée
     return null;
 }
+
+
+
 
 
