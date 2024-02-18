@@ -103,7 +103,7 @@ function applyMoveToBoard(player, move, board) {
     }
     // Gérer ici d'autres types d'actions, comme "wall"
 }
-
+x
 
 // Fonction pour afficher l'état du plateau
 function printBoard(board) {

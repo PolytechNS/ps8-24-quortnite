@@ -20,15 +20,14 @@ const setup = (AIplay) => {
 
 
 
-const nextMove = (gameState,player) => {
-    return new Promise((resolve, reject) => {
+
+const nextMove = (gameState, player) => {
+    return new Promise((resolve) => {
         setTimeout(() => {
-
-            const opponentWalls = gameState.opponentWalls;
-            const ownWalls = gameState.ownWalls;
-            const board = gameState.board;
-
             const myPosition = findPlayerPosition(gameState, player);
+            const adversaryPosition = findPlayerPosition(gameState, player === 1 ? 2 : 1);
+            let move;
+
 
 
             // Vérifier si le joueur 2 est juste en dessous de la ligne 5
@@ -65,18 +64,41 @@ const nextMove = (gameState,player) => {
             //     resolve(move);
 
 
-            const move = findShortestPathMove(gameState, player);
 
+            //HUZOG //
+            // const move = findShortestPathMove(gameState, player);
+            //
+            // // Vérifier si l'adversaire est au centre et si vous avez des murs à placer
+            // if (isAdversaryInCenter(adversaryPosition) && gameState.ownWalls.length > 0) {
+            //     const wallPlacement = calculateWallPlacements(adversaryPosition, gameState.ownWalls, gameState.board);
+            //     if (wallPlacement.length > 0) {
+            //         // Choisir le premier emplacement de mur proposé
+            //         move = { action: "wall", value: wallPlacement[0] };
+            //         resolve(move);
+            //         return;
+            //     }
+            // }
+
+
+            // Sinon, trouver le chemin le plus court vers la ligne d'arrivée
+            move = findShortestPathMove(gameState, player);
             if (move) {
                 resolve(move);
             } else {
-                // Si aucun mouvement possible n'est trouvé, rejeter la promesse ou envoyer un mouvement "idle"
+                // Si aucun mouvement n'est possible, retourner un mouvement "idle"
                 resolve({ action: "idle" });
-
             }
+
         }, 100); // resolving well before 200ms limit
+
     });
 };
+
+function isAdversaryInCenter(adversaryPosition) {
+    return adversaryPosition && adversaryPosition.x >= 3 && adversaryPosition.x <= 5 && adversaryPosition.y >= 3 && adversaryPosition.y <= 5;
+}
+
+
 
 const correction = (rightMove) => {
     return new Promise((resolve, reject) => {
@@ -104,6 +126,7 @@ exports.setup = setup;
 exports.nextMove = nextMove;
 exports.correction = correction;
 exports.updateBoard = updateBoard;
+
 
 
 
@@ -165,6 +188,30 @@ const findPossibleMoves = (gameState,player) => {
     return possibleMoves;
 };
 
+function calculateWallPlacements(opponentPosition, ownWalls, board) {
+    // Cette fonction doit retourner un tableau d'emplacements de murs potentiels
+    // en considérant la position actuelle de l'adversaire et le nombre de murs restants.
+    // Note : Ceci est un exemple simplifié. Vous devez adapter cette logique à votre stratégie.
+
+    let wallPlacements = [];
+
+    // Exemple de stratégie pour placer des murs : essayer de bloquer directement devant l'adversaire
+    // si possible, sans toutefois fermer complètement son chemin.
+    // On considère qu'on peut placer des murs horizontalement ou verticalement autour de l'adversaire.
+
+    // Vérifier s'il est possible de placer un mur horizontal ou vertical
+    // en fonction de la position de l'adversaire et des murs déjà présents.
+
+    // Exemple de vérification pour un mur horizontal directement au-dessus de l'adversaire
+    if (opponentPosition.y > 0 && ownWalls.length > 0) { // Assurez-vous qu'il y a de l'espace et des murs disponibles
+        const wallPosition = String.fromCharCode(97 + opponentPosition.x) + (opponentPosition.y);
+        wallPlacements.push([wallPosition, 0]); // 0 pour horizontal
+    }
+
+    // Ajouter d'autres conditions ici pour les murs verticaux ou dans d'autres directions
+
+    return wallPlacements;
+}
 
 
 function findShortestPathMove(gameState, player) {
@@ -210,6 +257,7 @@ function findShortestPathMove(gameState, player) {
 
 
 
+
 // Trouver une position valide pour placer un mur horizontal juste au-dessus de la ligne donnée
 // function findHorizontalWallPosition(gameState, aboveRowIndex) {
 //     // Parcourir les colonnes de la ligne spécifiée
@@ -229,6 +277,7 @@ function findShortestPathMove(gameState, player) {
 //     return null; // Retourner null si aucune position de mur n'est trouvée
 // }
 
+
 function findHorizontalWallPosition(gameState, aboveRowIndex, columnIndex) {
     // Assurez-vous que les indices sont dans les limites du tableau
     if (aboveRowIndex >= 0 && aboveRowIndex < gameState.board.length && columnIndex >= 0 && columnIndex < gameState.board[aboveRowIndex].length) {
@@ -245,4 +294,5 @@ function findHorizontalWallPosition(gameState, aboveRowIndex, columnIndex) {
     // Aucune position valide trouvée
     return null;
 }
+
 
