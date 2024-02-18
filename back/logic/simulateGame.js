@@ -4,7 +4,10 @@ const { setup, nextMove, correction, updateBoard } = require('./equipeQuortnite'
 let gameState = {
     opponentWalls: [],
     ownWalls: [],
-    board: Array(9).fill().map(() => Array(9).fill(0)),
+    board: Array(9).fill().map((_, rowIndex) =>
+        // Si l'index de la ligne est supérieur ou égal à 4 (la 5ème ligne et au-delà), remplir de -1
+        rowIndex >= 5 ? Array(9).fill(-1) : Array(9).fill(0)
+    ),
 };
 
 function delay(ms) {
@@ -46,6 +49,10 @@ async function simulateGame() {
             applyMoveToBoard(player, move, gameState.board);
             await updateBoard(gameState);
 
+            if (player === 2) {
+                updateVisibility(player, gameState.board);
+            }
+
             // Vérifier si le joueur a gagné
             if (hasPlayerWon(player, gameState.board)) {
                 winner = player;
@@ -55,7 +62,7 @@ async function simulateGame() {
 
             // Afficher l'état mis à jour du plateau
             printBoard(gameState.board);
-            await delay(2000);
+            await delay(1000);
         }
     }
 }
@@ -106,6 +113,28 @@ function printBoard(board) {
     console.log('\n');
 }
 
+
+function updateVisibility(player, board) {
+    // Trouver la position actuelle du joueur
+    for (let i = 0; i < board.length; i++) {
+        for (let j = 0; j < board[i].length; j++) {
+            if (board[i][j] === player) {
+                // Rendre les cases adjacentes invisibles (-1)
+                if (i > 0) board[i-1][j] = -1; // Case au-dessus
+                if (i < board.length - 1) board[i+1][j] = -1; // Case en-dessous
+                if (j > 0) board[i][j-1] = -1; // Case à gauche
+                if (j < board[i].length - 1) board[i][j+1] = -1; // Case à droite
+                return; // Sortie précoce après avoir mis à jour la visibilité
+            }
+        }
+    }
+}
+
+
 simulateGame().catch(console.error);
+
+
+
+
 
 

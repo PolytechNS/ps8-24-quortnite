@@ -30,6 +30,26 @@ const nextMove = (gameState,player) => {
 
             const myPosition = findPlayerPosition(gameState, player);
 
+
+            // Vérifier si le joueur 2 est juste en dessous de la ligne 5
+            const isPlayer2BelowLine5 = gameState.board[4].includes(-1);
+            console.log(isPlayer2BelowLine5);
+            let columnIndex = gameState.board[4].indexOf(-1);
+            console.log(columnIndex);
+
+            // S'il est temps de placer un mur horizontal
+            if (player === 1 && isPlayer2BelowLine5 && gameState.ownWalls.length < 10) {
+                console.log('wall');
+
+                // Trouver une position valide pour placer le mur
+                const wallPosition = findHorizontalWallPosition(gameState,4, columnIndex);
+
+                if (wallPosition) {
+                    resolve({ action: "wall", value: [wallPosition, 0] }); // 0 pour horizontal
+                    return;
+                }
+            }
+
             // if (!myPosition) {
             //     reject(new Error("Position du joueur non trouvée"));
             //     return;
@@ -44,6 +64,7 @@ const nextMove = (gameState,player) => {
             //
             //     resolve(move);
 
+
             const move = findShortestPathMove(gameState, player);
 
             if (move) {
@@ -53,7 +74,7 @@ const nextMove = (gameState,player) => {
                 resolve({ action: "idle" });
 
             }
-        }, 200); // resolving well before 200ms limit
+        }, 100); // resolving well before 200ms limit
     });
 };
 
@@ -184,5 +205,44 @@ function findShortestPathMove(gameState, player) {
     }
 
     return { action: "idle" }; // Retourner un mouvement "idle" si aucun chemin n'est trouvé
+}
+
+
+
+
+// Trouver une position valide pour placer un mur horizontal juste au-dessus de la ligne donnée
+// function findHorizontalWallPosition(gameState, aboveRowIndex) {
+//     // Parcourir les colonnes de la ligne spécifiée
+//     for (let j = 0; j < gameState.board[aboveRowIndex].length - 1; j++) {
+//         // Vérifier si les deux cases consécutives sont vides sur la ligne spécifiée
+//         if (gameState.board[aboveRowIndex][j] === 0 && gameState.board[aboveRowIndex][j+1] === 0) {
+//             // Assurez-vous qu'aucun mur ne se trouve déjà à cette position et qu'il est légal de placer le mur
+//             const wallNotPresent = !gameState.ownWalls.concat(gameState.opponentWalls).some(wall => {
+//                 return wall[0] === `${aboveRowIndex}${j}` && wall[1] === 0;
+//             });
+//             if (wallNotPresent) {
+//                 // Retourner la position du mur sous la forme 'ij'
+//                 return `${aboveRowIndex}${j}`;
+//             }
+//         }
+//     }
+//     return null; // Retourner null si aucune position de mur n'est trouvée
+// }
+
+function findHorizontalWallPosition(gameState, aboveRowIndex, columnIndex) {
+    // Assurez-vous que les indices sont dans les limites du tableau
+    if (aboveRowIndex >= 0 && aboveRowIndex < gameState.board.length && columnIndex >= 0 && columnIndex < gameState.board[aboveRowIndex].length) {
+            // Vérifier qu'aucun mur n'existe déjà à cet emplacement
+        const positionStr = `${aboveRowIndex}${columnIndex-1}`;
+        const wallExists = gameState.ownWalls.concat(gameState.opponentWalls).some(wall => wall[0] === positionStr && wall[1] === 0);
+
+        if (!wallExists) {
+            // La position du mur est valide
+            return positionStr;
+
+        }
+    }
+    // Aucune position valide trouvée
+    return null;
 }
 
