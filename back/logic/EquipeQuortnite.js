@@ -76,6 +76,18 @@ const correction = (rightMove) => {
 const updateBoard = (gameState) => {
     return new Promise((resolve, reject) => {
         setTimeout(() => {
+
+            try {
+
+                if(gameState.board){
+                    for(let i= 0;i<gameState.board.length; i++){
+                        for(let j= 0; j < gameState.board[i].length;j++){
+                            const cell = gameState.board[i][j];
+                        }
+                    }
+                }
+
+            }
             // Example: AI updates its internal state based on the game state, if necessary
             // This is a placeholder and should contain logic to update AI's game understanding
             resolve(true);
