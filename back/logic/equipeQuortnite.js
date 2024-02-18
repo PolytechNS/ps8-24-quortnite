@@ -70,12 +70,11 @@ const correction = (rightMove) => {
 };
 
 const updateBoard = (gameState) => {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
         setTimeout(() => {
-            // Example: AI updates its internal state based on the game state, if necessary
-            // This is a placeholder and should contain logic to update AI's game understanding
             resolve(true);
-        }, 10); // resolving well before 50ms limit
+
+            }, 10); // 10 ms à changer si trop court
     });
 };
 
