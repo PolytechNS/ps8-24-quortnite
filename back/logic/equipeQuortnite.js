@@ -21,63 +21,39 @@ const setup = (AIplay) => {
 
 
 
-const nextMove = (gameState) => {
+const nextMove = (gameState, player) => {
     return new Promise((resolve) => {
         setTimeout(() => {
-            const opponentWalls = gameState.opponentWalls;
-            const ownWalls = gameState.ownWalls;
-            const board = gameState.board;
-
             const myPosition = findPlayerPosition(gameState, player);
+            const adversaryPosition = findPlayerPosition(gameState, player === 1 ? 2 : 1);
+            let move;
 
-            // Trouver la position de votre IA sur le plateau
-            for (let i = 0; i < board.length; i++) {
-                for (let j = 0; j < board[i].length; j++) {
-                    if (board[i][j] === 1) { // 1 représente la position de votre IA
-                        myPosition = { x: i, y: j };
-                        break;
-                    }
-                }
-                if (myPosition) break;
-            }
-
-            // Détecter si l'adversaire est au centre
-            let adversaryInCenter = false;
-            for (let i = 3; i <= 5; i++) {
-                for (let j = 3; j <= 5; j++) {
-                    if (board[i][j] === 2) { // 2 représente la position de l'adversaire
-                        adversaryInCenter = true;
-                        break;
-                    }
-                }
-                if (adversaryInCenter) break;
-            }
-
-            // Si l'adversaire est au centre, essayer de placer un mur
-            if (adversaryInCenter && ownWalls.length > 0) {
-                // Logique pour choisir où placer le mur
-                // C'est un exemple simplifié. Vous devriez développer une stratégie plus complexe
-                // pour déterminer l'emplacement optimal du mur.
-                const wallToPlace = {
-                    action: "wall",
-                    value: ["e5", 0] // Exemple d'emplacement et d'orientation du mur
-                };
-                resolve(wallToPlace);
-            } else {
-                // Si l'adversaire n'est pas au centre ou si vous n'avez plus de murs, continuer le déplacement
-                let possibleMoves = findPossibleMoves(gameState);
-                if (possibleMoves.length > 0) {
-                    const randomIndex = Math.floor(Math.random() * possibleMoves.length);
-                    const move = possibleMoves[randomIndex];
+            // Vérifier si l'adversaire est au centre et si vous avez des murs à placer
+            if (isAdversaryInCenter(adversaryPosition) && gameState.ownWalls.length > 0) {
+                const wallPlacement = calculateWallPlacements(adversaryPosition, gameState.ownWalls, gameState.board);
+                if (wallPlacement.length > 0) {
+                    // Choisir le premier emplacement de mur proposé
+                    move = { action: "wall", value: wallPlacement[0] };
                     resolve(move);
-                } else {
-                    // Si aucun mouvement possible n'est trouvé, envoyer un mouvement "idle"
-                    resolve({ action: "idle" });
+                    return;
                 }
             }
-        }, 200); // resolving well before 200ms limit
+
+            // Sinon, trouver le chemin le plus court vers la ligne d'arrivée
+            move = findShortestPathMove(gameState, player);
+            if (move) {
+                resolve(move);
+            } else {
+                // Si aucun mouvement n'est possible, retourner un mouvement "idle"
+                resolve({ action: "idle" });
+            }
+        }, 200); // Résolution bien avant la limite de 200 ms
     });
 };
+
+function isAdversaryInCenter(adversaryPosition) {
+    return adversaryPosition && adversaryPosition.x >= 3 && adversaryPosition.x <= 5 && adversaryPosition.y >= 3 && adversaryPosition.y <= 5;
+}
 
 
 
