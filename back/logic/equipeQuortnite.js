@@ -1,12 +1,12 @@
-// EquipeQuortnite.js
+// equipeQuortnite.js
 const setup = (AIplay) => {
     return new Promise((resolve, reject) => {
         setTimeout(() => {
             let positionInitiale;
             if (AIplay === 1) {
-                positionInitiale = "A1"; // Si l'IA est le premier joueur, la position initiale est A1
+                positionInitiale = "OO"; // Si l'IA est le premier joueur, la position initiale est A1
             } else if (AIplay === 2) {
-                positionInitiale = "A9"; // Si l'IA est le deuxième joueur, la position initiale est A9
+                positionInitiale = "88"; // Si l'IA est le deuxième joueur, la position initiale est A9
             } else {
                 reject(new Error("Valeur AIplay invalide"));
                 return;
@@ -17,14 +17,7 @@ const setup = (AIplay) => {
 };
 
 
-const gameState = {
-    opponentWalls: [["A3", 0], ["C5", 1]],
-    ownWalls: [["B2", 1], ["D4", 0]],
-    board: [
-        [1, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-    ]
-};
+
 
 
 const nextMove = (gameState) => {
@@ -49,14 +42,18 @@ const nextMove = (gameState) => {
             }
 
             let possibleMoves = findPossibleMoves(gameState);
+            // Vérifier si la liste des mouvements possibles n'est pas vide
+            if (possibleMoves.length > 0) {
+                // Sélectionner un mouvement aléatoire parmi les mouvements possibles
+                const randomIndex = Math.floor(Math.random() * possibleMoves.length);
+                const move = possibleMoves[randomIndex];
 
+                resolve(move);
+            } else {
+                // Si aucun mouvement possible n'est trouvé, rejeter la promesse ou envoyer un mouvement "idle"
+                resolve({ action: "idle" });
 
-
-
-            const move = { action: "move", value: "B5" }; // This should depend on gameState
-
-
-            resolve(move);
+            }
         }, 100); // resolving well before 200ms limit
     });
 };
@@ -88,6 +85,8 @@ exports.setup = setup;
 exports.nextMove = nextMove;
 exports.correction = correction;
 exports.updateBoard = updateBoard;
+
+
 
 
 
