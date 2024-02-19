@@ -131,6 +131,17 @@ function finalizeWallPlacement(player) {
 
     validateButton.style.display = 'none';
     cancelButton.style.display = 'none';
+
+    // Décrémenter le nombre de murs disponibles
+    if (currentPlayer === 'player1') {
+        player1WallsRemaining--;
+    } else {
+        player2WallsRemaining--;
+    }
+    // Mettre à jour l'affichage du nombre de murs restants
+    updateWallsRemaining();
+
+
     togglePlayer();
 
     // Autres actions spécifiques au joueur ici...
