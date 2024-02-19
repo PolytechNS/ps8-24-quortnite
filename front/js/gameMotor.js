@@ -69,7 +69,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     board.addEventListener('click', handleInitialCellClick);
     //startPlayerTimer(); A remettre si on séparre la sauvgarde de la partie normale 
-    loadGameState();
 });
 
 function formatTime(timeInMillis) {
@@ -456,7 +455,7 @@ function cancelCurrentWallPlacement() {
 function cancelWallPlacement() {
     if (currentWallPlacement) {
         const { cellIndex, wallType } = currentWallPlacement;
-
+        
         // Supprimez le mur actuel
         cells[cellIndex].classList.remove('wall');
         cells[cellIndex].style.backgroundColor = '';
@@ -540,7 +539,6 @@ function validateWallPlacement() {
     }
     
 }
-
 
 function handleWallClick(cellIndex, wallType) {
     if(currentAction === 'move'|| !player1Position || !player2Position){
@@ -639,19 +637,23 @@ function placeWall(cellIndex, wallType) {
             applyVisibilityChange(adjCellIndex, currentPlayerVisibilityChange);
             updateVisibilityAdjacentToWall(adjCellIndex, currentPlayerVisibilityChange);
 
-        } else if (wallType === 'row') {
+        }else if (wallType === 'row') {
             let adjCellIndex;
+        
+            // Vérifier si la cellule adjacente ou la cellule actuelle contient un mur
             if ([33, 67, 101, 135, 169, 203, 237, 271].includes(cellIndex)) {
                 adjCellIndex = cellIndex - 2;
             } else {
                 adjCellIndex = cellIndex + 2;
             }
+        
             const adjWallCell = cells[adjCellIndex];
             // Mettez à jour la classe du mur adjacent
             adjWallCell.style.backgroundColor = 'orange';
             applyVisibilityChange(adjCellIndex, currentPlayerVisibilityChange);
             updateVisibilityAdjacentToWall(adjCellIndex, currentPlayerVisibilityChange);
         }
+        
 
     } else {
         // Créez un nouveau mur
@@ -675,7 +677,9 @@ function placeWall(cellIndex, wallType) {
 
         } else if (wallType === 'row') {
             let adjCellIndex;
-            if ([33, 67, 101, 135, 169, 203, 237, 271].includes(cellIndex)) {
+            const adjacentCellIndex = cellIndex + 2;  // Index de la cellule adjacente
+
+            if ([33, 67, 101, 135, 169, 203, 237, 271].includes(cellIndex)||hasWall(adjacentCellIndex)) {
                 adjCellIndex = cellIndex - 2;
             } else {
                 adjCellIndex = cellIndex + 2;
@@ -692,6 +696,9 @@ function placeWall(cellIndex, wallType) {
         cells.forEach(cell => cell.classList.remove('possible-move'));
 
     }
+}
+function hasWall(cellIndex) {
+    return cells[cellIndex].classList.contains('wall');
 }
 
 function updateWallsRemaining() {
