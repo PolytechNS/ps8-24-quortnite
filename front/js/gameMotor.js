@@ -509,37 +509,6 @@ function cancelWallPlacement() {
     }
 }
 
-function validateWallPlacement() {
-    if (currentWallPlacement && !currentWallPlacement.placed) {
-        // Marquez le mur comme placé
-        currentWallPlacement.placed = true;
-
-        if (currentPlayer === 'player1') {
-            placedWallsPlayer1.push(cellIndex);
-        } else {
-            placedWallsPlayer2.push(cellIndex);
-        
-        }
-    
-        // Décrémenter le nombre de murs disponibles uniquement lorsque le placement est validé
-        if (currentPlayer === 'player1') {
-            player1WallsRemaining--;
-        } else {
-            player2WallsRemaining--;
-        }
-    
-        // Mettre à jour l'affichage du nombre de murs restants
-        updateWallsRemaining();
-
-        // Cachez le bouton "Valider"
-        const validateButton = document.getElementById(`validateButton${currentPlayer.charAt(0).toUpperCase() + currentPlayer.slice(1)}`);
-        const cancelButton = document.getElementById(`cancelButton${currentPlayer.charAt(0).toUpperCase() + currentPlayer.slice(1)}`);
-        validateButton.style.display = 'none';
-        cancelButton.style.display = 'none';
-    }
-    
-}
-
 function handleWallClick(cellIndex, wallType) {
     if(currentAction === 'move'|| !player1Position || !player2Position){
         return;
