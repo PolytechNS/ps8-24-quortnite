@@ -18,6 +18,8 @@ let player1WallsRemaining = 10;
 let player2WallsRemaining = 10;
 let currentWallPlacement = null;
 let visibilityChangedCells = new Set();
+const wallLinks = {};
+
 
 document.addEventListener('DOMContentLoaded', () => {
     const board = document.getElementById('board');
@@ -644,7 +646,8 @@ function placeWall(cellIndex, wallType) {
 
         if (wallType === 'column') {
             let adjCellIndex;
-            if ([273, 275, 277, 279, 281, 283, 285, 287].includes(cellIndex)) {
+            const adjacentCellIndex = cellIndex + 34;  // Index de la cellule adjacente
+            if ([273, 275, 277, 279, 281, 283, 285, 287].includes(cellIndex)||hasWall(adjacentCellIndex)) {
                 adjCellIndex = cellIndex - 34;
             }else{
                 adjCellIndex = cellIndex + 34;
