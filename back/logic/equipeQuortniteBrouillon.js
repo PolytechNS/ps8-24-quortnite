@@ -13,14 +13,18 @@
 // for the "move" action: a position string
 // for the "wall" action: a list containing 2 elements --> a position string representing the top-left square that the wall is in contact with, and an integer: 0 if the wall is placed horizontally or 1 if it is vertical.
 
+let AIplayeNumber = 0;
+
 const setup = (AIplay) => {
     return new Promise((resolve, reject) => {
         setTimeout(() => {
             let positionInitiale;
             if (AIplay === 1) {
                 positionInitiale = "11"; // Si l'IA est le premier joueur, la position initiale est A1
+                AIplayeNumber = 1;
             } else if (AIplay === 2) {
                 positionInitiale = "19"; // Si l'IA est le deuxième joueur, la position initiale est A9
+                AIplayeNumber = 2;
             } else {
                 reject(new Error("Valeur AIplay invalide"));
                 return;
@@ -43,17 +47,17 @@ const nextMove = (gameState) => {
             let move;
 
 
-            // Placement des murs verticaux en commençant du bas (pour le joueur 1) ou du haut (pour le joueur 2)
-            if (gameState.ownWalls.length < 4) {
-                let wallColumnIndex =1; // Ajustez selon la colonne de départ pour chaque joueur
-                let wallRowIndex = gameState.ownWalls.length * 2 + 1; // Assurez-vous que les murs sont placés verticalement l'un après l'autre
-
-                // Convertir les indices en position de mur au format "colonne-ligne"
-                let wallPosition = `${wallColumnIndex}${wallRowIndex}`;
-
-                resolve({ action: "wall", value: [wallPosition, 1] }); // 1 pour vertical
-                return;
-            }
+            // // Placement des murs verticaux en commençant du bas (pour le joueur 1) ou du haut (pour le joueur 2)
+            // if (gameState.ownWalls.length < 4) {
+            //     let wallColumnIndex =1; // Ajustez selon la colonne de départ pour chaque joueur
+            //     let wallRowIndex = gameState.ownWalls.length * 2 + 1; // Assurez-vous que les murs sont placés verticalement l'un après l'autre
+            //
+            //     // Convertir les indices en position de mur au format "colonne-ligne"
+            //     let wallPosition = `${wallColumnIndex}${wallRowIndex}`;
+            //
+            //     resolve({ action: "wall", value: [wallPosition, 1] }); // 1 pour vertical
+            //     return;
+            // }
 
 
 
@@ -96,7 +100,7 @@ const nextMove = (gameState) => {
 
 
             // Sinon, trouver le chemin le plus court vers la ligne d'arrivée
-            move = findShortestPathMove(gameState);
+            move = findShortestPathMove(gameState,AIplayeNumber);
 
             if (move) {
                 resolve(move);
@@ -229,21 +233,27 @@ function calculateWallPlacements(opponentPosition, ownWalls, board) {
 
 
 
-function findShortestPathMove(gameState) {
+function findShortestPathMove(gameState,AIplay) {
     const startPosition = findPlayerPosition(gameState);
     if (!startPosition) return null;
 
-    const targetRow = player === 1 ? gameState.board.length - 1 : 0;
+    const targetRow = AIplay === 1 ? 0:gameState.board.length - 1 ;
+
+    console.log("1");
+
+
     let queue = [{ position: startPosition, path: [] }];
     let visited = new Set([`${startPosition.x},${startPosition.y}`]);
 
     while (queue.length > 0) {
+        console.log("2");
         let { position, path } = queue.shift();
 
         // Vérifier si la position actuelle est la ligne d'arrivée
         if (position.x === targetRow) {
-            console.log
+            console.log("3");
             if (path.length > 0) {
+                console.log("4");
                 // Conversion de la première étape du chemin en format "colonne-ligne"
                 const firstMove = path[0];
                 const moveCol = firstMove.value[1]; // Extraction de la colonne (y)
@@ -263,11 +273,14 @@ function findShortestPathMove(gameState) {
         ];
 
         directions.forEach(({ dx, dy }) => {
+            console.log("5");
             let newX = position.x + dx;
             let newY = position.y + dy;
 
             if (newX >= 0 && newX < gameState.board.length && newY >= 0 && newY < gameState.board[0].length && !visited.has(`${newX},${newY}`)) {
                 visited.add(`${newX},${newY}`);
+
+                console.log("6");
                 // Ajout du mouvement en format "colonne-ligne" dans le chemin
                 const newMoveCol = newX +1;
                 const newMoveRow = newY +1;
