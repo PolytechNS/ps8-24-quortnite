@@ -121,14 +121,123 @@ const nextMove = (gameState) => {
 const correction = (rightMove) => {
     return new Promise((resolve, reject) => {
         setTimeout(() => {
-            // Example: AI simply accepts the correction without processing
+            // Extract necessary information from the correct move
+            const correctAction = rightMove.action;
+            const correctValue = rightMove.value;
 
-            const readyToContinue = true;
-
-            resolve(readyToContinue);
-        }, 10); // resolving well before 50ms limit
+            // Check if the correct action is a move or wall placement
+            if (correctAction === "move") {
+                const isValidMove = isValidMovePosition(correctValue, gameState);
+                if (isValidMove) {
+                    const readyToContinue = true;
+                    resolve(readyToContinue);
+                } else {
+                    // Adjust the move or reject if not valid
+                    // Example: Adjust the move position or reject the correction
+                    reject(new Error("Invalid move"));
+                }
+            }
+            else if (correctAction === "wall") {
+                const isValidWallPlacement = isValidWallPosition(correctValue, gameState);
+                if (isValidWallPlacement) {
+                    const readyToContinue = true;
+                    resolve(readyToContinue);
+                } else {
+                    // Adjust the wall placement or reject if not valid
+                    // Example: Adjust the wall position or reject the correction
+                    reject(new Error("Invalid wall placement"));
+                }
+            }
+             else {
+                // Unknown action, reject the correction
+                reject(new Error("Unknown correct action"));
+            }
+        }, 10); // Resolving well before the 50ms limit
     });
 };
+
+
+const isValidMovePosition = (movePosition, gameState) => {
+    const [newX, newY] = movePosition.split('').map(coord => parseInt(coord));
+
+    // Check if the new position is within the boundaries of the board
+    if (
+        newX >= 0 && newX < gameState.board.length &&
+        newY >= 0 && newY < gameState.board[0].length
+    ) {
+        // Check if the new position is not blocked by a wall
+        const isMoveBlockedByWall = gameState.ownWalls.concat(gameState.opponentWalls).some(wall => {
+            const [wallPosition, orientation] = wall;
+            const wallX = parseInt(wallPosition[0]);
+            const wallY = parseInt(wallPosition[1]);
+
+            if (orientation === 0) {
+                // Horizontal wall
+                return (
+                    (newX === wallX && newY === wallY) ||
+                    (newX === wallX + 1 && newY === wallY)
+                );
+            } else {
+                // Vertical wall
+                return (
+                    (newX === wallX && newY === wallY) ||
+                    (newX === wallX && newY === wallY + 1)
+                );
+            }
+        });
+
+        return !isMoveBlockedByWall;
+    }
+
+    return false;
+};
+
+
+const isValidWallPosition = (wallPlacement, gameState) => {
+    const [positionStr, orientation] = wallPlacement;
+    const rowIndex = parseInt(positionStr[0]);
+    const columnIndex = parseInt(positionStr[1]);
+
+    // Vérifier si la position du mur est dans les limites du plateau
+    if (
+        rowIndex >= 0 && rowIndex < gameState.board.length &&
+        columnIndex >= 0 && columnIndex < gameState.board[0].length
+    ) {
+        // Vérifier si le mur ne chevauche pas d'autres murs
+        const isWallOverlap = gameState.ownWalls.concat(gameState.opponentWalls).some(wall => {
+            const [wallPosition, wallOrientation] = wall;
+            const wallRow = parseInt(wallPosition[0]);
+            const wallCol = parseInt(wallPosition[1]);
+
+            if (orientation === 0) {
+                // Mur horizontal
+                return (
+                    (rowIndex === wallRow && columnIndex <= wallCol && wallCol < columnIndex + 2) ||
+                    (rowIndex === wallRow + 1 && columnIndex <= wallCol && wallCol < columnIndex + 2)
+                );
+            } else {
+                // Mur vertical
+                return (
+                    (rowIndex <= wallRow && wallRow < rowIndex + 2 && columnIndex === wallCol) ||
+                    (rowIndex <= wallRow && wallRow < rowIndex + 2 && columnIndex === wallCol + 1)
+                );
+            }
+        });
+
+        // Vérifier si la position du mur est légale selon les règles du jeu
+        const isLegalWallPosition = (
+            (orientation === 0 && columnIndex < gameState.board[0].length - 1) ||
+            (orientation === 1 && rowIndex < gameState.board.length - 1)
+        );
+
+        return !isWallOverlap && isLegalWallPosition;
+    }
+
+    return false;
+};
+
+
+
 
 const updateBoard = (gameState) => {
     return new Promise((resolve) => {
