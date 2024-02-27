@@ -1,4 +1,4 @@
-// equipeQuortnite.js
+// equipeQuortniteBrouillon.js
 
 
 // he gameState object has the following properties:
