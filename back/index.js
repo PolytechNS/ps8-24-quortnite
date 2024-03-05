@@ -1,15 +1,18 @@
 // The http module contains methods to handle http queries.
 const http = require('http')
 const socketIO = require('socket.io');
+const { MongoClient } = require("mongodb");
+
 
 
 // Let's import our logic.
 const fileQuery = require('./queryManagers/front.js')
 const apiQuery = require('./queryManagers/api.js')
 
-const { MongoClient } = require("mongodb");
+
 const jwt = require("jsonwebtoken");
 
+// Connexion à la base de données MongoDB
 const uri = "mongodb://root:example@mongodb:27017";
 const client = new MongoClient(uri);
 
@@ -113,6 +116,50 @@ gameNamespace.on('connection', (socket) => {
         }
     });
 
+    socket.on('save game',async(gameState)=>{
+        console.log('Saving game state:', gameState);
+        try {
+            const gamesCollection = client.db('GameSaved').collection('games');
+
+            // un id pour chaque partie
+            const result = await gamesCollection.updateOne(
+                //si on veut save les parties on peut mettre un id ici
+                //{ gameId: gameState.gameId }, // Trouve le document basé sur l'ID du jeu
+                { $set: gameState }, // Met à jour l'état du jeu
+                { upsert: true } // Créé le document s'il n'existe pas
+            );
+
+            socket.emit('game saved', { message: 'Game state saved successfully.' });
+        } catch (error) {
+            console.error('Error saving game state:', error);
+            socket.emit('game save error', { message: 'Failed to save game state.' });
+        }
+    });
+
+    socket.on('request game state',async ()=>{
+
+    })
+
+    socket.on('request game state', async () => {
+        console.log('Client is requesting the current game state');
+        try {
+            const gamesCollection = client.db('GameSaved').collection('games');
+
+            // Récupérer le dernier état du jeu sauvegardé
+            //a changer peut etre avec l'id
+            const gameState = await gamesCollection.findOne({ /* critères de recherche si nécessaire */ }, { sort: { _id: -1 } });
+
+            if (gameState) {
+                socket.emit('current game state', gameState);
+            } else {
+                socket.emit('game state error', { message: 'No game state found.' });
+            }
+        } catch (error) {
+            console.error('Error retrieving game state:', error);
+            socket.emit('game state error', { message: 'Failed to retrieve game state.' });
+        }
+    });
+
     // Gérez les nouveaux mouvements du joueur
     socket.on('newMove', (move) => {
         // Validez le mouvement
@@ -138,6 +185,8 @@ io.on('connection', (socket) => {
 
     // Handle other socket events as needed
 });
+
+
 
 server.listen(port, host, () => {
     console.log(`Server is running on http://${host}:${port}`);

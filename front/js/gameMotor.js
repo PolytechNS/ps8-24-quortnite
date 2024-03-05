@@ -1,4 +1,6 @@
 // script.js
+const socket = io('http://localhost:8000');
+
 let currentPlayer = 'player1';
 let player1Timer;
 let player2Timer;
@@ -20,28 +22,55 @@ let player2WallsRemaining = 10;
 let currentWallPlacement = null;
 let visibilityChangedCells = new Set();
 
-function loadGameState() {
-    const savedGameState = localStorage.getItem('gameState');
-    if (savedGameState) {
-        const gameState = JSON.parse(savedGameState);
-        player1Position = gameState.player1Position;
-        player2Position = gameState.player2Position;
-        player1WallsRemaining = gameState.player1WallsRemaining;
-        player2WallsRemaining = gameState.player2WallsRemaining;
-        currentPlayer = gameState.currentPlayer;
-        wallsState = gameState.wallsState || {};
-        player1Timer = gameState.player1TimeRemaining;
-        player2Timer = gameState.player2TimeRemaining;
 
-
-        // On met à jour l'UI
-        updateUIBasedOnGameState();
-
-        updateWallsUI();
-
-        restoreTimers(gameState);
+function saveGameState(){
+    const gameState = {
+        currentPlayer: currentPlayer,
+        players: players,
+        wallsState: wallsState,
+        player1Position: player1Position,
+        player2Position: player2Position,
+        placedWallsPlayer1: placedWallsPlayer1,
+        placedWallsPlayer2: placedWallsPlayer2,
+        player1WallsRemaining: player1WallsRemaining,
+        player2WallsRemaining: player2WallsRemaining,
+        player1TimeRemaining : player1Timer,
+        player2TimeRemaining : player2Timer
+        // faut ajouter ici d'autres états de jeu (le timer ect)
     }
+    socket.emit('save game',gameState);
 }
+
+socket.on('game saved', (confirmationMessage) => {
+    console.log(confirmationMessage);
+});
+
+function loadGameState() {
+    socket.emit('request game state');
+}
+
+// Ajouter un écouteur pour l'événement 'game state' qui sera émis par le serveur avec l'état du jeu
+socket.on('game state', (gameState) => {
+    // Mettre à jour les variables d'état du jeu ici avec les données reçues du serveur
+    currentPlayer = gameState.currentPlayer;
+    players = gameState.players;
+    wallsState = gameState.wallsState;
+    player1Position = gameState.player1Position;
+    player2Position = gameState.player2Position;
+    placedWallsPlayer1 = gameState.placedWallsPlayer1;
+    placedWallsPlayer2 = gameState.placedWallsPlayer2;
+    player1WallsRemaining = gameState.player1WallsRemaining;
+    player2WallsRemaining = gameState.player2WallsRemaining;
+    player1Timer = gameState.player1TimeRemaining;
+    player2Timer = gameState.player2TimeRemaining;
+    // Ajoutez ici toutes les autres propriétés que vous stockez dans l'état du jeu
+
+
+    updateUIBasedOnGameState();
+    updateWallsUI();
+    restoreTimers(gameState);
+    // Vous devrez peut-être appeler d'autres fonctions pour mettre à jour l'UI
+});
 
 function updateWallsUI() {
     Object.keys(wallsState).forEach(cellIndex => {
@@ -52,6 +81,7 @@ function updateWallsUI() {
             wallElement.classList.add('wall', wallType);
         }
     });
+   // saveGameState();
 }
 
 function restoreTimers(gameState) {
@@ -118,20 +148,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 });
-
-function saveGameState(){
-    const gameState = {
-        player1Position: player1Position,
-        player2Position: player2Position,
-        player1WallsRemaining: player1WallsRemaining,
-        player2WallsRemaining: player2WallsRemaining,
-        currentPlayer: currentPlayer,
-        wallsState: wallsState,
-        player1TimeRemaining: player1Timer,
-        player2TimeRemaining: player2Timer,
-    };
-    localStorage.setItem('gameState', JSON.stringify(gameState));
-}
 
 function updateUIBasedOnGameState() {
     // Mettre à jour la position des joueurs sur le plateau.
