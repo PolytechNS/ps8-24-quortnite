@@ -50,7 +50,7 @@ function loadGameState() {
 }
 
 // Ajouter un écouteur pour l'événement 'game state' qui sera émis par le serveur avec l'état du jeu
-socket.on('game state', (gameState) => {
+socket.on('current game state', (gameState) => {
     // Mettre à jour les variables d'état du jeu ici avec les données reçues du serveur
     currentPlayer = gameState.currentPlayer;
     players = gameState.players;

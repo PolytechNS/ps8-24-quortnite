@@ -144,10 +144,7 @@ gameNamespace.on('connection', (socket) => {
         console.log('Client is requesting the current game state');
         try {
             const gamesCollection = client.db('GameSaved').collection('games');
-
-            // Récupérer le dernier état du jeu sauvegardé
-            //a changer peut etre avec l'id
-            const gameState = await gamesCollection.findOne({ /* critères de recherche si nécessaire */ }, { sort: { _id: -1 } });
+            const gameState = await gamesCollection.findOne({}, { sort: { _id: -1 } }); // Récupère le dernier jeu sauvegardé
 
             if (gameState) {
                 socket.emit('current game state', gameState);
