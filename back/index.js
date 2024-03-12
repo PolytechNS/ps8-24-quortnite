@@ -13,7 +13,8 @@ const apiQuery = require('./queryManagers/api.js')
 const jwt = require("jsonwebtoken");
 
 // Connexion à la base de données MongoDB
-const uri = "mongodb://root:example@mongodb:27017";
+const uri = "mongodb://root:example@mongo:27017";
+
 const client = new MongoClient(uri);
 
 
