@@ -1,4 +1,4 @@
-const { setup: setupEquipe1, nextMove: nextMoveEquipe1, correction: correctionEquipe1, updateBoard: updateBoardEquipe1 } = require('./equipeQuortnite1');
+const { setup: setupEquipe1, nextMove: nextMoveEquipe1, correction: correctionEquipe1, updateBoard: updateBoardEquipe1 } = require('./EquipeQuortnite');
 const { setup: setupEquipe2, nextMove: nextMoveEquipe2, correction: correctionEquipe2, updateBoard: updateBoardEquipe2 } = require('./EquipeQuortnite2');
 
 

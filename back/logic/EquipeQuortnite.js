@@ -5,10 +5,10 @@ const setup = (AIplay) => {
         setTimeout(() => {
             let positionInitiale;
             if (AIplay === 1) {
-                positionInitiale = "19"; // Si l'IA est le premier joueur, la position initiale est 19
+                positionInitiale = "11"; // Si l'IA est le premier joueur, la position initiale est 19
                 AIplayeNumber = 1;
             } else if (AIplay === 2) {
-                positionInitiale = "11"; // Si l'IA est le deuxième joueur, la position initiale est 11
+                positionInitiale = "99"; // Si l'IA est le deuxième joueur, la position initiale est 11
                 AIplayeNumber = 2;
             } else {
                 reject(new Error("Valeur AIplay invalide"));
@@ -34,15 +34,31 @@ const nextMove = (gameState) => {
 
 
             if (gameState.ownWalls.length < 4) {
-                let wallColumnIndex = 1; // Ajustez selon la colonne de départ pour chaque joueur
-                let wallRowIndex = gameState.ownWalls.length * 2 + 1; // Assurez-vous que les murs sont placés verticalement l'un après l'autre
+                if (AIplayeNumber === 1) {
+                    let wallColumnIndex = 1; // Ajustez selon la colonne de départ pour chaque joueur
+                    let wallRowIndex = gameState.ownWalls.length * 2 + 2; // Assurez-vous que les murs sont placés verticalement l'un après l'autre
 
-                // Convertir les indices en position de mur au format "colonne-ligne"
-                let wallPosition = `${wallColumnIndex}${wallRowIndex}`;
+                    // Convertir les indices en position de mur au format "colonne-ligne"
+                    let wallPosition = `${wallColumnIndex}${wallRowIndex}`;
 
-                resolve({action: "wall", value: [wallPosition, 1]}); // 1 pour vertical
-                return;
+                    resolve({action: "wall", value: [wallPosition, 1]}); // 1 pour vertical
+                    return;
+                }
+
+                else if (AIplayeNumber === 2) {
+                        let wallColumnIndex = 8; // Ajustez selon la colonne de départ pour chaque joueur
+                        let wallRowIndex = gameState.ownWalls.length * 2 + 2; // Assurez-vous que les murs sont placés verticalement l'un après l'autre
+
+                        // Convertir les indices en position de mur au format "colonne-ligne"
+                        let wallPosition = `${wallColumnIndex}${wallRowIndex}`;
+
+                        resolve({action: "wall", value: [wallPosition, 1]}); // 1 pour vertical
+                        return;
+                    }
             }
+
+
+
 
 
             const depth = 3; // Ajustez en fonction des performances et de la complexité
@@ -84,7 +100,7 @@ const updateBoard = (gameState) => {
         setTimeout(() => {
             resolve(true);
 
-        }, 10); // 10 ms à changer si trop court
+        }, 10);
     });
 };
 
@@ -103,7 +119,7 @@ function findPlayerPosition(gameState) {
     for (let i = 0; i < gameState.board.length; i++) {
         for (let j = 0; j < gameState.board[i].length; j++) {
             if (gameState.board[i][j] === 1) {
-                return { y: j, x: i };
+                return { x: j, y: i };
             }
         }
     }
@@ -115,7 +131,7 @@ function findShortestPathMove(gameState, AIplayNumber) {
     if (!startPosition) return null;
 
     // Détermine la ligne cible basée sur le joueur
-    const targetRow = AIplayNumber === 1 ? 0 : gameState.board.length - 1;
+    const targetRow = AIplayNumber === 1 ?  gameState.board.length - 1 :0 ;
 
     console.log("targetRow", targetRow);
 
