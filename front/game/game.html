@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="../css/game-style.css">
-    <link rel="stylesheet" href="../css/quitButton.css">
+    <link rel="stylesheet" href="game-style.css">
+    <link rel="stylesheet" href="../quitGame/quitButton.css">
     <title>Quortnite</title>
 </head>
 <body>
@@ -25,7 +25,12 @@
         </div>
         <div id="wallsRemainingPlayer1" class="walls-remaining">Remaining walls: 10</div>
         <div class="timer" id="player1Timer">00:40</div>
-        <button id="validateButtonPlayer1" style="display: none;">Valider</button>
+        <div class="button-container">
+            <button id="validateButtonPlayer1" style="display: none;">Valider</button>
+            <button id="cancelButtonPlayer1" style="display: none;">Annuler</button>
+        </div>
+       
+
 
     </div>
 
@@ -41,19 +46,29 @@
         </div>
         <div id="wallsRemainingPlayer2" class="walls-remaining">Remaining walls: 10</div>
         <div class="timer" id="player2Timer">00:40</div>
+        <div class="button-container">
+             <button id="validateButtonPlayer2" style="display: none;">Valider</button>
+            <button id="cancelButtonPlayer2" style="display: none;">Annuler</button>
+        </div>
 
         <div class="quitButton"> <button id="quitButton">Quitter</button> </div>
 
-        <button id="validateButtonPlayer2" style="display: none;">Valider</button>
+       
+
 
     </div>
 </div>
 
 <table id="quortniteGrid"></table>
 
+<<<<<<< HEAD:front/html/game.html
 <script src="../js/socket.io.js"></script>
 <script src="../js/gameMotor.js"></script>
 <script src="../js/quitGame.js"></script>
+=======
+<script src="gameMotor.js"></script>
+<script src="../quitGame/quitGame.js"></script>
+>>>>>>> dev_social:front/game/game.html
 
 
 </body>

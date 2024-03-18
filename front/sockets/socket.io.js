@@ -2602,7 +2602,11 @@
   /**
    * These strings must not be used as event names, as they have a special meaning.
    */
+<<<<<<< HEAD:front/js/socket.io.js
   var RESERVED_EVENTS$1 = ["connect", "connect_error", "disconnect", "disconnecting", "newListener", "removeListener" // used by the Node.js EventEmitter
+=======
+  var RESERVED_EVENTS$1 = ["connect", "connect_error", "disconnect", "disconnecting", "newListener", "removeListener" // used by the Node.sockets EventEmitter
+>>>>>>> dev_social:front/sockets/socket.io.js
   ];
   /**
    * Protocol version.
@@ -4383,3 +4387,4 @@
 
 }));
 //# sourceMappingURL=socket.io.js.map
+

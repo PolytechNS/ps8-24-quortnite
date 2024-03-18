@@ -1,6 +1,10 @@
+<<<<<<< HEAD:front/js/gameMotor.js
 // script.js
 const socket = io('http://localhost:8000');
 
+=======
+// script.sockets
+>>>>>>> dev_social:front/game/gameMotor.js
 let currentPlayer = 'player1';
 let player1Timer;
 let player2Timer;
@@ -9,7 +13,6 @@ let players = {
     player2: {x: null, y: null, symbol: 'P2'}
 };
 
-let wallsState = {};
 let player1Position = null;
 let player2Position = null;
 let currentAction = 'none';
@@ -22,6 +25,7 @@ let player2WallsRemaining = 10;
 let currentWallPlacement = null;
 let visibilityChangedCells = new Set();
 
+<<<<<<< HEAD:front/js/gameMotor.js
 
 function saveGameState(){
     const gameState = {
@@ -92,6 +96,8 @@ function restoreTimers(gameState) {
 
 }
 
+=======
+>>>>>>> dev_social:front/game/gameMotor.js
 document.addEventListener('DOMContentLoaded', () => {
     console.log("Avant");
     const board = document.getElementById('board');
@@ -130,9 +136,6 @@ document.addEventListener('DOMContentLoaded', () => {
         updateCellAppearance(firstRowCell, 1);
     });
 
-
-
-
     // Appliquer la classe 'first-row' aux cellules de la première ligne du joueur opposé
     const oppositePlayer = currentPlayer === 'player1' ? 'player2' : 'player1';
     const oppositeFirstRow = firstRow === 0 ? 16 : 0; // Inverser la rangée pour le joueur opposé
@@ -145,6 +148,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     board.addEventListener('click', handleInitialCellClick);
+<<<<<<< HEAD:front/js/gameMotor.js
     startPlayerTimer();
     console.log("Apres");
     loadGameState();
@@ -201,18 +205,24 @@ function updatePlayerPositions() {
     }
 }
 
+=======
+    //startPlayerTimer(); A remettre si on séparre la sauvgarde de la partie normale 
+    loadGameState();
+});
+
+>>>>>>> dev_social:front/game/gameMotor.js
 function formatTime(timeInMillis) {
     let minutes = Math.floor(timeInMillis / 60000);
     let seconds = ((timeInMillis % 60000) / 1000).toFixed(0);
     return minutes + ":" + (seconds < 10 ? '0' : '') + seconds;
 }
 
-//let validateButton = document.getElementById('validateButton');
-//validateButton.addEventListener('click', handleValidateButtonClick);
 
 // Ajoute ces lignes dans la fonction 'DOMContentLoaded' après la création des éléments HTML
 document.getElementById('validateButtonPlayer1').addEventListener('click', handleValidateButtonClickPlayer1);
 document.getElementById('validateButtonPlayer2').addEventListener('click', handleValidateButtonClickPlayer2);
+document.getElementById('cancelButtonPlayer1').addEventListener('click', handleCancelButtonClickPlayer1);
+document.getElementById('cancelButtonPlayer2').addEventListener('click', handleCancelButtonClickPlayer2);
 
 function handleValidateButtonClickPlayer1() {
     // Logique de validation pour le joueur 1
@@ -222,6 +232,20 @@ function handleValidateButtonClickPlayer1() {
 function handleValidateButtonClickPlayer2() {
     // Logique de validation pour le joueur 2
     finalizeWallPlacementPlayer2();
+}
+
+
+
+function handleCancelButtonClickPlayer1() {
+    // Logique d'annulation pour le joueur 1
+    cancelCurrentWallPlacement();
+    cancelButtonPlayer1.style.display = 'none';
+}
+
+function handleCancelButtonClickPlayer2() {
+    // Logique d'annulation pour le joueur 2
+    cancelCurrentWallPlacement();
+    cancelButtonPlayer2.style.display = 'none';
 }
 
 function finalizeWallPlacementPlayer1() {
@@ -243,19 +267,13 @@ function finalizeWallPlacement(player) {
 
     // Accède au bouton de validation spécifique au joueur
     const validateButton = document.getElementById(`validateButton${player.charAt(0).toUpperCase() + player.slice(1)}`);
+    const cancelButton = document.getElementById(`cancelButton${player.charAt(0).toUpperCase() + player.slice(1)}`);
 
     validateButton.style.display = 'none';
-
-     // Décrémenter le nombre de murs disponibles
-     if (currentPlayer === 'player1') {
-        player1WallsRemaining--;
-    } else {
-        player2WallsRemaining--;
-    }
-    // Mettre à jour l'affichage du nombre de murs restants
-    updateWallsRemaining();
-
+    cancelButton.style.display = 'none';
     togglePlayer();
+
+    // Autres actions spécifiques au joueur ici...
 }
 
 function startTimer(timerId) {
@@ -267,22 +285,20 @@ function startTimer(timerId) {
         seconds = (seconds < 10) ? "0" + seconds : seconds;
 
         timerElement.textContent = "00:" + seconds;
-
-        if (--duration <= 0) {
-            //clearInterval(timerInterval);
-            timerElement.textContent = "Temps écoulé!";
-            console.log("Le temps est écoulé! Passer au joueur suivant...");
-            switchPlayerTurn();
+        --duration;
+        if (timerElement.textContent === "00:00") {
+            togglePlayer();
         }
-        
     }, 1000);
 }
 
 function startPlayerTimer() {
     if (currentPlayer === 'player1') {
         player1Timer = startTimer('player1Timer');
+        document.getElementById('player2Timer').innerText = formatTime(40000); 
     } else {
         player2Timer = startTimer('player2Timer');
+        document.getElementById('player1Timer').innerText = formatTime(40000); 
     }
 }
 
@@ -299,12 +315,11 @@ function updateTimer(timerId) {
         timerElement.innerText = `Timer: ${remainingTime - 1}s`;
     } else {
         switchPlayerTurn();
+        console.log("time heeeeeeere")
     }
 }
 
 function switchPlayerTurn() {
-    clearInterval(player1Timer);
-    clearInterval(player2Timer);
     if (currentPlayer === 'player1') {
         currentPlayer = 'player2';
     } else {
@@ -312,7 +327,6 @@ function switchPlayerTurn() {
     }
     resetPlayerTimer();
     togglePlayer();
-    saveGameState();
 }
 
 function handleInitialCellClick(event) {
@@ -361,7 +375,6 @@ function resetGame() {
     // Réinitialiser les positions des joueurs
     player1Position = null;
     player2Position = null;
-    wallsState = {};
     player1WallsRemaining = 10;
     player2WallsRemaining = 10;
     currentPlayer = 'player1';
@@ -369,7 +382,6 @@ function resetGame() {
     cells.forEach(cell => {
         cell.classList.remove('player1', 'player2','wall');
     });
-    saveGameState();
     updateUIBasedOnGameState();
     resetPlayerTimer();
 
@@ -400,7 +412,6 @@ function setPlayerPosition(cellIndex, player) {
         player2Position = cellIndex;
     }
 
-    saveGameState();
 }
 function getValidMoves(position) {
     const row = Math.floor(position / 17);
@@ -418,15 +429,10 @@ function getValidMoves(position) {
 function togglePlayer(){
     currentPlayer = (currentPlayer === 'player1') ? 'player2' : 'player1';
     currentAction = 'none'; // Réinitialiser l'action pour le prochain joueur
-
+    
+    resetPlayerTimer();
     updateCellVisibility();
     openAntiCheatPage();
-
-    clearInterval(player1Timer);
-    clearInterval(player2Timer);
-
-
-    startPlayerTimer();
 
     const playerPosition = currentPlayer === 'player1' ? player1Position : player2Position;
     const visibilityChange = currentPlayer === 'player1' ? 2 : 2;
@@ -435,7 +441,6 @@ function togglePlayer(){
 
     // Mettre à jour le compteur de murs
     updateWallsRemaining();
-    saveGameState();
 
 }
 function updateCellVisibility() {
@@ -586,27 +591,27 @@ function cancelCurrentWallPlacement() {
         cancelWallPlacement();
     }
 }
+
 function cancelWallPlacement() {
     if (currentWallPlacement) {
         const { cellIndex, wallType } = currentWallPlacement;
-
-        // Ajoutez l'indice du mur annulé à placedWalls du joueur actuel
-        if (currentPlayer === 'player1') {
-            placedWallsPlayer1.push(cellIndex);
-        } else {
-            placedWallsPlayer2.push(cellIndex);
-        
-        }
 
         // Supprimez le mur actuel
         cells[cellIndex].classList.remove('wall');
         cells[cellIndex].style.backgroundColor = '';
 
+        cells.forEach(cell => cell.classList.remove('possible-move'));
+
         const currentPlayerVisibilityChange = currentPlayer === 'player1' ? 2 : -2;
         applyVisibilityChange(cellIndex, -currentPlayerVisibilityChange);
 
         if (wallType === 'column') {
-            const adjCellIndex = cellIndex + 34;
+            let adjCellIndex;
+            if ([273, 275, 277, 279, 281, 283, 285, 287].includes(cellIndex)) {
+                adjCellIndex = cellIndex - 34;
+            }else{
+                adjCellIndex = cellIndex + 34;
+            }
             cells[adjCellIndex].classList.remove('wall');
             cells[adjCellIndex].style.backgroundColor = '';
 
@@ -614,7 +619,12 @@ function cancelWallPlacement() {
             updateVisibilityAdjacentToWall(adjCellIndex, -currentPlayerVisibilityChange);
 
         } else if (wallType === 'row') {
-            const adjCellIndex = cellIndex + 2;
+            let adjCellIndex;
+            if ([33, 67, 101, 135, 169, 203, 237, 271].includes(cellIndex)) {
+                adjCellIndex = cellIndex - 2;
+            } else {
+                adjCellIndex = cellIndex + 2;
+            }
             cells[adjCellIndex].classList.remove('wall');
             cells[adjCellIndex].style.backgroundColor = '';
 
@@ -627,12 +637,55 @@ function cancelWallPlacement() {
 
         // Cachez le bouton "Valider"
         const validateButton = document.getElementById(`validateButton${currentPlayer.charAt(0).toUpperCase() + currentPlayer.slice(1)}`);
+        const cancelButton = document.getElementById(`cancelButton${currentPlayer.charAt(0).toUpperCase() + currentPlayer.slice(1)}`);
         validateButton.style.display = 'none';
+        cancelButton.style.display = 'none';
+
+
+        // Réinitialiser les classes 'possible-move' sur les cellules valides
+        currentAction = 'none';
+        const validMoves = getValidMoves(currentPlayer === 'player1' ? player1Position : player2Position);
+        validMoves.forEach(move => cells[move].classList.add('possible-move'));
     }
 }
 
+function validateWallPlacement() {
+    if (currentWallPlacement && !currentWallPlacement.placed) {
+        // Marquez le mur comme placé
+        currentWallPlacement.placed = true;
+
+        if (currentPlayer === 'player1') {
+            placedWallsPlayer1.push(cellIndex);
+        } else {
+            placedWallsPlayer2.push(cellIndex);
+        
+        }
+    
+        // Décrémenter le nombre de murs disponibles uniquement lorsque le placement est validé
+        if (currentPlayer === 'player1') {
+            player1WallsRemaining--;
+        } else {
+            player2WallsRemaining--;
+        }
+    
+        // Mettre à jour l'affichage du nombre de murs restants
+        updateWallsRemaining();
+
+        // Cachez le bouton "Valider"
+        const validateButton = document.getElementById(`validateButton${currentPlayer.charAt(0).toUpperCase() + currentPlayer.slice(1)}`);
+        const cancelButton = document.getElementById(`cancelButton${currentPlayer.charAt(0).toUpperCase() + currentPlayer.slice(1)}`);
+        validateButton.style.display = 'none';
+        cancelButton.style.display = 'none';
+    }
+    
+}
+
+
 function handleWallClick(cellIndex, wallType) {
     if(currentAction === 'move'|| !player1Position || !player2Position){
+        return;
+    }
+    if (cells[cellIndex].classList.contains('wall')) {
         return;
     }
 
@@ -659,9 +712,18 @@ function handleWallClick(cellIndex, wallType) {
         placeWall(cellIndex, wallType);
         currentAction = 'placeWall';
         const validateButton = document.getElementById(`validateButton${currentPlayer.charAt(0).toUpperCase() + currentPlayer.slice(1)}`);
+        const cancelButton = document.getElementById(`cancelButton${currentPlayer.charAt(0).toUpperCase() + currentPlayer.slice(1)}`);
         validateButton.style.display = 'block';
+        cancelButton.style.display = 'block';
+
         //togglePlayer();
     }
+
+    const validMoves = getValidMoves(currentPlayer === 'player1' ? player1Position : player2Position);
+    // Supprimer la classe 'possible-move' de toutes les cellules
+    cells.forEach(cell => cell.classList.remove('possible-move'));
+
+
 }
 
 function canPlaceWall(cellIndex, wallType) {
@@ -671,16 +733,21 @@ function canPlaceWall(cellIndex, wallType) {
     // et qu'il respecte les règles du jeu Qoridor.
     // Vous pouvez utiliser la position actuelle des joueurs et les indices des murs.
     // Exemple : vérifiez si le mur chevauche d'autres murs ou s'il bloque le chemin d'un joueur.
+    let row = Math.floor(cellIndex / 17);
+    let col = cellIndex % 17;
+    if (row % 2 !== 0 && col % 2 !== 0) {
+        return false;
+    }
+    if (row % 2 !== 0 && col % 2 !== 0) {return false;}
     if (cells[cellIndex].classList.contains('wall')) {
         return false;
     }
-
-    let row = Math.floor(cellIndex / 17);
-    let col = cellIndex % 17;
-    if (row % 2 !== 0 && col % 2 !== 0) {return false;}
-
+    if (placedWallsPlayer1.includes(cellIndex) || placedWallsPlayer2.includes(cellIndex)) {
+        return false;
+    }
     // Placeholder, veuillez mettre en œuvre votre propre logique
     return true;
+    
 }
 
 function placeWall(cellIndex, wallType) {
@@ -699,7 +766,12 @@ function placeWall(cellIndex, wallType) {
         applyVisibilityChange(cellIndex, currentPlayerVisibilityChange);
 
         if (wallType === 'column') {
-            const adjCellIndex = cellIndex + 34;
+            let adjCellIndex;
+            if ([273, 275, 277, 279, 281, 283, 285, 287].includes(cellIndex)) {
+                adjCellIndex = cellIndex - 34;
+            }else{
+                adjCellIndex = cellIndex + 34;
+            }
             const adjWallCell = cells[adjCellIndex];
             // Mettez à jour la classe du mur adjacent
             adjWallCell.style.backgroundColor = 'orange';
@@ -707,7 +779,12 @@ function placeWall(cellIndex, wallType) {
             updateVisibilityAdjacentToWall(adjCellIndex, currentPlayerVisibilityChange);
 
         } else if (wallType === 'row') {
-            const adjCellIndex = cellIndex + 2;
+            let adjCellIndex;
+            if ([33, 67, 101, 135, 169, 203, 237, 271].includes(cellIndex)) {
+                adjCellIndex = cellIndex - 2;
+            } else {
+                adjCellIndex = cellIndex + 2;
+            }
             const adjWallCell = cells[adjCellIndex];
             // Mettez à jour la classe du mur adjacent
             adjWallCell.style.backgroundColor = 'orange';
@@ -723,7 +800,12 @@ function placeWall(cellIndex, wallType) {
         applyVisibilityChange(cellIndex, currentPlayerVisibilityChange);
 
         if (wallType === 'column') {
-            const adjCellIndex = cellIndex + 34;
+            let adjCellIndex;
+            if ([273, 275, 277, 279, 281, 283, 285, 287].includes(cellIndex)) {
+                adjCellIndex = cellIndex - 34;
+            }else{
+                adjCellIndex = cellIndex + 34;
+            }
             cells[adjCellIndex].classList.add('wall');
             cells[adjCellIndex].style.backgroundColor = 'orange';
 
@@ -731,13 +813,23 @@ function placeWall(cellIndex, wallType) {
             updateVisibilityAdjacentToWall(adjCellIndex, currentPlayerVisibilityChange);
 
         } else if (wallType === 'row') {
-            const adjCellIndex = cellIndex + 2;
+            let adjCellIndex;
+            if ([33, 67, 101, 135, 169, 203, 237, 271].includes(cellIndex)) {
+                adjCellIndex = cellIndex - 2;
+            } else {
+                adjCellIndex = cellIndex + 2;
+            }
             cells[adjCellIndex].classList.add('wall');
             cells[adjCellIndex].style.backgroundColor = 'orange';
 
             applyVisibilityChange(adjCellIndex, currentPlayerVisibilityChange);
             updateVisibilityAdjacentToWall(adjCellIndex, currentPlayerVisibilityChange);
         }
+
+        const validMoves = getValidMoves(currentPlayer === 'player1' ? player1Position : player2Position);
+        // Supprimer la classe 'possible-move' de toutes les cellules
+        cells.forEach(cell => cell.classList.remove('possible-move'));
+
     }
 }
 
@@ -812,7 +904,7 @@ function isWallBetweenPositions(startIndex, endIndex) {
 }
 
 function openAntiCheatPage() {
-    const antiCheatUrl = 'anti-cheat-sheet.html';
+    const antiCheatUrl = 'anti-cheat-sheet.acceuil';
 
     const width = 850;
     const height = 600;
