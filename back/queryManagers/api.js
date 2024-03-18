@@ -16,7 +16,9 @@ async function connectToDb() {
 }
 
 function getUsersCollection() {
+    console.log("client 1");
     const database = client.db(dbName);
+    console.log("client 2");
     return database.collection("users");
 }
 

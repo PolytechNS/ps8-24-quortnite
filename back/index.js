@@ -3,6 +3,8 @@ const http = require('http')
 const socketIO = require('socket.io');
 const { MongoClient } = require("mongodb");
 
+const argument = process.argv[2];
+
 
 
 // Let's import our logic.
@@ -13,9 +15,21 @@ const apiQuery = require('./queryManagers/api.js')
 const jwt = require("jsonwebtoken");
 
 // Connexion à la base de données MongoDB
-const uri = "mongodb://root:example@mongo:27017";
+let uri;
+if(argument === "dev"){
+    console.log("dev");
+    uri = "mongodb://root:example@localhost:27017/";
+}else{
+    console.log("prod");
+    uri = "mongodb://root:example@localhost:27017/";
+}
 
-const client = new MongoClient(uri);
+
+const client = new MongoClient(uri, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    serverSelectionTimeoutMS: 5000 // Timeout after 5s instead of 30s
+});
 
 
 const host = '0.0.0.0';
@@ -69,7 +83,7 @@ const server=http.createServer(function (request, response) {
 
 const io = socketIO(server, {
     cors: {
-        origin: "http://localhost:63342", // This should match the origin your client is served from
+        origin: "http://localhost:8000", // This should match the origin your client is served from
         methods: ["GET", "POST"],
         allowedHeaders: ["my-custom-header"],
         credentials: true
@@ -77,10 +91,10 @@ const io = socketIO(server, {
 });
 
 
-const gameNamespace = io.of('/api/game');
+//const gameNamespace = io.of('/api/game');
 
-const secret = 'votre_cle_secrete';
-gameNamespace.use((socket, next) => {
+const secret = 'example';
+io.use((socket, next) => {
     const token = jwt.sign({ data: 'your_data_here' }, secret, { expiresIn: '1h' });
     console.log(token);
 
@@ -103,7 +117,7 @@ gameNamespace.use((socket, next) => {
 
 
 
-gameNamespace.on('connection', (socket) => {
+io.on('connection', (socket) => {
     console.log("Un utilisateur s'est connecté à /api/game");
 
     // Configurez le jeu lorsqu'une connexion est reçue
@@ -117,7 +131,7 @@ gameNamespace.on('connection', (socket) => {
         }
     });
 
-    socket.on('save game',async(gameState)=>{
+    socket.on('saveGame',async(gameState)=>{
         console.log('Saving game state:', gameState);
         try {
             const gamesCollection = client.db('GameSaved').collection('games');
@@ -130,31 +144,27 @@ gameNamespace.on('connection', (socket) => {
                 { upsert: true } // Créé le document s'il n'existe pas
             );
 
-            socket.emit('game saved', { message: 'Game state saved successfully.' });
+            socket.emit('gameSaved', { message: 'Game state saved successfully.' });
         } catch (error) {
             console.error('Error saving game state:', error);
-            socket.emit('game save error', { message: 'Failed to save game state.' });
+            socket.emit('gameSaveError', { message: 'Failed to save game state.' });
         }
     });
-
-    socket.on('request game state',async ()=>{
-
-    })
-
-    socket.on('request game state', async () => {
+    console.log("Testons");
+    socket.on('requestGameState', async () => {
         console.log('Client is requesting the current game state');
         try {
             const gamesCollection = client.db('GameSaved').collection('games');
             const gameState = await gamesCollection.findOne({}, { sort: { _id: -1 } }); // Récupère le dernier jeu sauvegardé
 
             if (gameState) {
-                socket.emit('current game state', gameState);
+                socket.emit('currentGameState', gameState);
             } else {
                 socket.emit('game state error', { message: 'No game state found.' });
             }
         } catch (error) {
             console.error('Error retrieving game state:', error);
-            socket.emit('game state error', { message: 'Failed to retrieve game state.' });
+            socket.emit('gameStateError', { message: 'Failed to retrieve game state.' });
         }
     });
 

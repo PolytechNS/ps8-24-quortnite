@@ -38,19 +38,21 @@ function saveGameState(){
         player2TimeRemaining : player2Timer
         // faut ajouter ici d'autres états de jeu (le timer ect)
     }
-    socket.emit('save game',gameState);
+    socket.emit('saveGame',gameState);
 }
 
-socket.on('game saved', (confirmationMessage) => {
+socket.on('gameSaved', (confirmationMessage) => {
     console.log(confirmationMessage);
 });
 
 function loadGameState() {
-    socket.emit('request game state');
+    console.log("duringLoadGames");
+    socket.emit('requestGameState');
+    console.log("afterDuringLoadGames");
 }
 
 // Ajouter un écouteur pour l'événement 'game state' qui sera émis par le serveur avec l'état du jeu
-socket.on('current game state', (gameState) => {
+socket.on('currentGameState', (gameState) => {
     // Mettre à jour les variables d'état du jeu ici avec les données reçues du serveur
     currentPlayer = gameState.currentPlayer;
     players = gameState.players;
@@ -91,6 +93,7 @@ function restoreTimers(gameState) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    console.log("Avant");
     const board = document.getElementById('board');
     // Create the board cells
     for (let i = 0; i < 289; i++) {
@@ -143,7 +146,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     board.addEventListener('click', handleInitialCellClick);
     startPlayerTimer();
+    console.log("Apres");
     loadGameState();
+    console.log("afterloadgame");
 
 
 
