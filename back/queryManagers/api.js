@@ -141,9 +141,9 @@ function addCors(response) {
 }
 
 
-export {addCors};
+//export {addCors};
 
-
+exports.addCors=addCors;
 
 exports.manage = manageRequest;
 
@@ -234,7 +234,7 @@ async function manageRequest(request, response) {
                 if (passwordValid) {
                     const token = jwt.sign({ email: data.email }, 'votre_cle_secrete');
                     response.writeHead(200, { 'Content-Type': 'application/json' });
-                    response.end(JSON.stringify({ token }));
+                    response.end(JSON.stringify({ token }));W
 
                 } else {
                 response.writeHead(403, { 'Content-Type': 'application/json' });
