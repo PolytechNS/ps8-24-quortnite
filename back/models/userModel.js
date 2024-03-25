@@ -16,6 +16,8 @@ class UserModel {
     }
 
 
+
+
 /*    // Créer un utilisateur
     async createUser(username, mail, password) {
         const user = {
@@ -62,5 +64,5 @@ class UserModel {
 // (dans un fichier séparé après avoir établi une connexion à MongoDB)
 // const db = client.db('your_database_name');
 // const userModel = new UserModel(db);
-
+export default UserModel;
 module.exports = UserModel;

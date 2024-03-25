@@ -2,13 +2,15 @@ import { MongoClient } from 'mongodb';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import UserModel from '../models/userModel.js';
+//import { UserModel } from '../models/userModel.js';
+
 
 const SECRET_KEY = 'votre_cle_secrete';
 
 
 
 
-exports.registerUser = async (users, reqBody) => {
+export async function registerUser(users, reqBody) {
     const { email, password } = reqBody;
     const existingUser = await users.findUserByEmail(email);
 
@@ -21,9 +23,9 @@ exports.registerUser = async (users, reqBody) => {
 
     const token = jwt.sign({ email }, SECRET_KEY);
     return { message: 'Inscription réussie', token };
-};
+}
 
-exports.loginUser = async (users, reqBody) => {
+export async function loginUser(users, reqBody) {
     const { email, password } = reqBody;
     const user = await users.findUserByEmail(email);
 
@@ -38,7 +40,7 @@ exports.loginUser = async (users, reqBody) => {
 
     const token = jwt.sign({ email }, SECRET_KEY);
     return { token };
-};
+}
 
 
 /*

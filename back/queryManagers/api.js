@@ -1,23 +1,20 @@
 // Main method, exported at the end of the file. It's the one that will be called when a REST request is received.
 
 
-const http = require('http');
-const jwt = require('jsonwebtoken'); // Utilisez jsonwebtoken pour créer des JWT
-const fs = require('fs');
-
-const { MongoClient } = require("mongodb");
-const bcrypt = require("bcryptjs");
-
-const {sendResponse, urlNotFound,BODY, PARAMS} = require("./utilsApi");
-const {SIGNUP_API,LOGIN_API,CHATS_API,USERS_API} = require("../../front/utils/path");
-const {userSignUpOrLogin} = require("./user/accountApi");
-const {messagesApiGet} = require("./chat/apiChats.js");
-
+import http from 'http';
+import jwt from 'jsonwebtoken';
+import fs from 'fs';
+import { MongoClient } from "mongodb";
+import bcrypt from "bcryptjs";
+import { sendResponse, urlNotFound, BODY, PARAMS } from "./utilsApi.js";
+import { SIGNUP_API, LOGIN_API, USERS_API } from "../../front/utils/path.js";
+import { userSignUpOrLogin } from "./user/accountApi.js";
+//import { messagesApiGet } from "./chat/apiChats.js";
+//CHATS_API
 
 const uri = "mongodb://root:example@mongodb:27017";
 const client = new MongoClient(uri);
 const dbName = "DatabaseName";
-
 
 
 
@@ -59,9 +56,9 @@ function manageRequest(request, response) {
             break;
         case "GET":
             switch (urlPathArray[0] + "/") {
-                case CHATS_API:
+                case USERS_API:
                     urlPathArray.shift()
-                    messagesApiGet(request, response, urlPathArray);
+                    //messagesApiGet(request, response, urlPathArray);
                     break;
 
                 default:
@@ -141,11 +138,10 @@ function addCors(response) {
 }
 
 
-//export {addCors};
 
-exports.addCors=addCors;
-
-exports.manage = manageRequest;
+//exports.addCors=addCors;
+export { addCors, manageRequest };
+export default manageRequest;
 
 
 

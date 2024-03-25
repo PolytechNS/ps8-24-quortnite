@@ -1,8 +1,8 @@
-import UserValidator from "../../object/UserValidator.sockets";
+//import UserValidator from './object/UserValidator.js';
 import userdb from "../../database/userdb.js";
 import jwt from "jsonwebtoken";
 import {BODY, sendResponse} from "../utilsApi.js";
-import {JWTSecretCode} from "../../credentials/credentials.sockets";
+//import {JWTSecretCode} from "../../credentials/credentials.sockets";
 import bcrypt from "bcryptjs";
 
 import {addCors} from "../api.js";

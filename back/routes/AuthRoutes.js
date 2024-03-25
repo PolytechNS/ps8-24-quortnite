@@ -1,11 +1,12 @@
-const { manageRequest: registerUser } = require('../controllers/AuthController').registerUser;
-const { manageRequest: loginUser } = require('../controllers/AuthController').loginUser;
+// Importez les fonctions spécifiques depuis AuthController
+import { registerUser as manageRegisterUser, loginUser as manageLoginUser } from '../controllers/AuthController.js';
 
-module.exports = async function AuthRoutes(request, response, users) {
+// Exportez la fonction AuthRoutes comme export par défaut
+export default async function AuthRoutes(request, response, users) {
     if (request.url.match(/^\/api\/inscription$/) && request.method === 'POST') {
         const body = await getRequestBody(request);
         try {
-            const result = await registerUser(users, body);
+            const result = await manageRegisterUser(users, body);
             sendJsonResponse(response, result, 200);
         } catch (error) {
             sendJsonResponse(response, { error: error.message }, 400);
@@ -13,7 +14,7 @@ module.exports = async function AuthRoutes(request, response, users) {
     } else if (request.url.match(/^\/api\/login$/) && request.method === 'POST') {
         const body = await getRequestBody(request);
         try {
-            const result = await loginUser(users, body);
+            const result = await manageLoginUser(users, body);
             sendJsonResponse(response, result, 200);
         } catch (error) {
             sendJsonResponse(response, { error: error.message }, 403);
@@ -22,7 +23,7 @@ module.exports = async function AuthRoutes(request, response, users) {
         response.writeHead(404);
         response.end();
     }
-};
+}
 
 async function getRequestBody(request) {
     return new Promise((resolve) => {

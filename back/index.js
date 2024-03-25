@@ -1,32 +1,28 @@
 // The http module contains methods to handle http queries.
-const http = require('http')
-const socketIO = require('socket.io');
-const { MongoClient } = require("mongodb");
-
-const argument = process.argv[2];
+import http from 'http';
+import { Server as SocketIO } from 'socket.io';
+import { MongoClient } from "mongodb";
+import jwt from "jsonwebtoken";
 
 
 
 // Let's import our logic.
-const fileQuery = require('./queryManagers/front.js')
-const apiQuery = require('./queryManagers/api.js')
-const AuthRoutes = require('./routes/AuthRoutes.js');
-const UserModel = require('./models/userModel.js');
+import fileQuery from './queryManagers/front.js';
+import apiQuery from './queryManagers/api.js';
+import AuthRoutes from './routes/AuthRoutes.js';
+import UserModel from './models/userModel.js';
 
-
-
-const jwt = require("jsonwebtoken");
+const argument = process.argv[2];
 
 // Connexion à la base de données MongoDB
 let uri;
-if(argument === "dev"){
+if (argument === "dev") {
     console.log("dev");
     uri = "mongodb://root:example@localhost:27017/";
-}else{
+} else {
     console.log("prod");
     uri = "mongodb://root:example@localhost:27017/";
 }
-
 
 const client = new MongoClient(uri, {
     useNewUrlParser: true,
@@ -34,64 +30,30 @@ const client = new MongoClient(uri, {
     serverSelectionTimeoutMS: 5000 // Timeout after 5s instead of 30s
 });
 
-
 const host = '0.0.0.0';
 const port = 8000;
 
-
-/*async function run() {
-    try {
-        const database = client.db('sample_mflix');
-        const movies = database.collection('movies');
-        // Query for a movie that has the title 'Back to the Future'
-        const query = { title: 'Back to the Future' };
-        const movie = await movies.findOne(query);
-        console.log(movie);
-    } finally {
-        // Ensures that the client will close when you finish/error
-        await client.close();
-    }
-}
-run().catch(console.dir);*/
-
-
-
-/* The http module contains a createServer function, which takes one argument, which is the function that
-** will be called whenever a new request arrives to the server.
- */
-const server=http.createServer(function (request, response) {
-    // First, let's check the URL to see if it's a REST request or a file request.
-    // We will remove all cases of "../" in the url for security purposes.
-    let filePath = request.url.split("/").filter(function(elem) {
+const server = http.createServer(function (request, response) {
+    let filePath = request.url.split("/").filter(function (elem) {
         return elem !== "..";
     });
 
     try {
-        // If the URL starts by /api, then it's a REST request (you can change that if you want).
         if (filePath[1] === "api") {
             apiQuery.manage(request, response);
-            // If it doesn't start by /api, then it's a request for a file.
         } else {
             fileQuery.manage(request, response);
         }
-    } catch(error) {
-        console.log(`error while processing ${request.url}: ${error}`)
+    } catch (error) {
+        console.log(`error while processing ${request.url}: ${error}`);
         response.statusCode = 400;
         response.end(`Something in your request (${request.url}) is strange...`);
     }
-
-
-
-// For the server to be listening to request, it needs a port, which is set thanks to the listen function.
 });
 
-// We will use the socket.io library to handle websockets.
-
-
-
-const io = socketIO(server, {
+const io = new SocketIO(server, {
     cors: {
-        origin: "http://localhost:8000", // This should match the origin your client is served from
+        origin: "http://localhost:8000",
         methods: ["GET", "POST"],
         allowedHeaders: ["my-custom-header"],
         credentials: true

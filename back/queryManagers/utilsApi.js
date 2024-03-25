@@ -1,6 +1,6 @@
 //import {validateJwt} from "../auth/jwtParserBack.sockets";
 
-const { validateJwt } = require("../auth/jwtParserBack.sockets");
+//const { validateJwt } = require("../auth/jwtParserBack.sockets");
 
 
 const PARAMS = "params";
@@ -44,31 +44,13 @@ function authorizeRequest(request, response) {
     return true;
 }
 
-//export {sendResponse, checkAuthorization, authorizeRequest, urlNotFound, PARAMS, BODY, USER_ID, USERNAME};
-
-exports.sendResponse = sendResponse;
-exports.checkAuthorization = checkAuthorization;
-exports.authorizeRequest = authorizeRequest;
-exports.urlNotFound = urlNotFound;
-exports.PARAMS = PARAMS;
-exports.BODY = BODY;
-exports.USER_ID = USER_ID;
-exports.USERNAME = USERNAME;
-
-
-
-
-
-
-
-
-
+export {sendResponse, checkAuthorization, authorizeRequest, urlNotFound, PARAMS, BODY, USER_ID, USERNAME};
 
 
 //import {JWTSecretCode} from "../credentials/credentials.sockets"; //clé secrète
 //import crypto from "crypto"
 const crypto = require("crypto");
-const { JWTSecretCode } = require("../credentials/credentials.sockets");
+//const { JWTSecretCode } = require("../credentials/credentials.sockets");
 
 function validateJwt(token) {
     const [headerEncoded, payloadEncoded, signatureEncoded] = token.split('.');
@@ -109,6 +91,6 @@ function isTokenValid(token) {
 
 
 
-exports.validateJwt  = validateJwt;
-exports.isTokenValid = isTokenValid;
-//export {validateJwt, isTokenValid};
+//exports.validateJwt  = validateJwt;
+//exports.isTokenValid = isTokenValid;
+export {validateJwt, isTokenValid};
