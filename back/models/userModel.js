@@ -1,4 +1,4 @@
-const { MongoClient, ObjectId } = require('mongodb');
+import { MongoClient, ObjectId } from 'mongodb';
 
 class UserModel {
     constructor(db) {
@@ -65,4 +65,4 @@ class UserModel {
 // const db = client.db('your_database_name');
 // const userModel = new UserModel(db);
 export default UserModel;
-module.exports = UserModel;
+//module.exports = UserModel;

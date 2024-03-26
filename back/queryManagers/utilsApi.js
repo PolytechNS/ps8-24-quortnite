@@ -48,8 +48,8 @@ export {sendResponse, checkAuthorization, authorizeRequest, urlNotFound, PARAMS,
 
 
 //import {JWTSecretCode} from "../credentials/credentials.sockets"; //clé secrète
-//import crypto from "crypto"
-const crypto = require("crypto");
+import crypto from "crypto"
+//const crypto = require("crypto");
 //const { JWTSecretCode } = require("../credentials/credentials.sockets");
 
 function validateJwt(token) {

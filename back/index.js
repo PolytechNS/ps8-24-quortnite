@@ -7,7 +7,7 @@ import jwt from "jsonwebtoken";
 
 
 // Let's import our logic.
-import fileQuery from './queryManagers/front.js';
+//import fileQuery from './queryManagers/front.js';
 import apiQuery from './queryManagers/api.js';
 import AuthRoutes from './routes/AuthRoutes.js';
 import UserModel from './models/userModel.js';
@@ -42,7 +42,7 @@ const server = http.createServer(function (request, response) {
         if (filePath[1] === "api") {
             apiQuery.manage(request, response);
         } else {
-            fileQuery.manage(request, response);
+            //fileQuery.manage(request, response);
         }
     } catch (error) {
         console.log(`error while processing ${request.url}: ${error}`);
