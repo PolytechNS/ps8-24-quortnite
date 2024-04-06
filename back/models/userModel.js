@@ -1,5 +1,3 @@
-import { MongoClient, ObjectId } from 'mongodb';
-
 class UserModel {
     constructor(db) {
         this.collection = db.collection('users');
@@ -14,8 +12,6 @@ class UserModel {
     async createUser(email, hashedPassword) {
         return await this.collection.insertOne({ email, password: hashedPassword });
     }
-
-
 
 
 /*    // Créer un utilisateur
@@ -64,5 +60,5 @@ class UserModel {
 // (dans un fichier séparé après avoir établi une connexion à MongoDB)
 // const db = client.db('your_database_name');
 // const userModel = new UserModel(db);
-export default UserModel;
-//module.exports = UserModel;
+
+module.exports = UserModel;

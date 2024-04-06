@@ -1,25 +1,55 @@
+
 // Main method, exported at the end of the file. It's the one that will be called when a REST request is received.
+import {BODY, PARAMS, sendResponse, urlNotFound} from "./utilsApi.js";
+import {userLogIn, userSignUp} from "./user/accountApi.js";;
+import {friendsApiDelete, friendsApiGet, friendsApiPost} from "./friends/apiFriends.js";
+import {usersApiGet} from "./user/usersApi.js";
+import {notificationsApiDelete, notificationsApiGet} from "./notification/apiNotifications.js";
+import {messagesApiGet} from "./chat/apiChats.js";
+import {
+    ACHIEVEMENTS_API,
+    CHATS_API,
+    FRIENDS_API,
+    LOGIN_API,
+    NOTIFICATIONS_API,
+    SIGNUP_API,
+    STATS_API,
+    USERS_API
+} from "../../front/util/path.js";
 
 
-import http from 'http';
-import jwt from 'jsonwebtoken';
-import fs from 'fs';
-import { MongoClient } from "mongodb";
-import bcrypt from "bcryptjs";
-import { sendResponse, urlNotFound, BODY, PARAMS } from "./utilsApi.js";
-import { SIGNUP_API, LOGIN_API, USERS_API } from "../../front/utils/path.js";
-import { userSignUpOrLogin } from "./user/accountApi.js";
-//import { messagesApiGet } from "./chat/apiChats.js";
-//CHATS_API
 
-const uri = "mongodb://root:example@mongodb:27017";
-const client = new MongoClient(uri);
-const dbName = "DatabaseName";
+
+
+
+// const http = require('http');
+// const jwt = require('jsonwebtoken'); // Utilisez jsonwebtoken pour créer des JWT
+// const fs = require('fs');
+//
+// const { MongoClient } = require("mongodb");
+// const bcrypt = require("bcryptjs");
+//
+// const {sendResponse, urlNotFound,BODY, PARAMS} = require("./utilsApi");
+// const {SIGNUP_API,LOGIN_API,CHATS_API,USERS_API,FRIENDS_API, NOTIFICATIONS_API} = require("../../front/util/path");
+//
+// const {userSignUpOrLogin, usersApiGet} = require("./user/userApi");
+// const {messagesApiGet} = require("./chat/apiChats");
+// const {friendsApiDelete, friendsApiGet, friendsApiPost}=require("./friends/apiFriends.js");
+// const {notificationsApiDelete,notificationsApiGet} = require("./notification/apiNotifications");
+// const {userLogin, userSignUp, userLogIn} = require("./user/accountApi");
+//
+//
+// const uri = "mongodb://root:example@mongodb:27017";
+// const client = new MongoClient(uri);
+// const dbName = "DatabaseName";
+
 
 
 
 
 function manageRequest(request, response) {
+
+
     addCors(response)
 
     let url = request.url.split("?")
@@ -44,10 +74,17 @@ function manageRequest(request, response) {
 
                 switch (urlPathArray[0] + "/") {
                     case SIGNUP_API:
-                        userSignUpOrLogin(request, response);
+                        //userSignUpOrLogin(request, response);
+                        userSignUp(request, response);
+
                         break;
                     case LOGIN_API:
-                        userSignUpOrLogin(request, response);
+                        userLogIn(request, response);
+                        //userSignUpOrLogin(request, response);
+                        break;
+                    case FRIENDS_API:
+                        urlPathArray.shift();
+                        friendsApiPost(request, response, urlPathArray);
                         break;
                     default:
                         urlNotFound(request, response)
@@ -58,8 +95,17 @@ function manageRequest(request, response) {
             switch (urlPathArray[0] + "/") {
                 case USERS_API:
                     urlPathArray.shift()
-                    //messagesApiGet(request, response, urlPathArray);
+                    usersApiGet(request, response,urlPathArray);
                     break;
+                case FRIENDS_API:
+                    urlPathArray.shift()
+                    friendsApiGet(request, response, urlPathArray);
+                    break;
+                case CHATS_API:
+                    urlPathArray.shift()
+                    messagesApiGet(request, response, urlPathArray);
+                    break;
+
 
                 default:
                     urlNotFound(request, response)
@@ -67,6 +113,10 @@ function manageRequest(request, response) {
             break;
         case "DELETE":
             switch (urlPathArray[0] + "/") {
+                case FRIENDS_API:
+                    urlPathArray.shift()
+                    friendsApiDelete(request, response, urlPathArray);
+                    break;
                 default:
                     urlNotFound(request, response)
             }
@@ -138,10 +188,12 @@ function addCors(response) {
 }
 
 
+//export {addCors};
+//module.exports = { addCors };
 
-//exports.addCors=addCors;
-export { addCors, manageRequest };
-export default manageRequest;
+
+export {manageRequest as manage};
+
 
 
 
@@ -159,9 +211,7 @@ async function connectToDb() {
 }
 
 function getUsersCollection() {
-    console.log("client 1");
     const database = client.db(dbName);
-    console.log("client 2");
     return database.collection("users");
 }
 
@@ -212,7 +262,6 @@ async function manageRequest(request, response) {
                     //saveToken(data.email, data.username, data.password, token);
 
                     response.writeHead(200, { 'Content-Type': 'application/json' });
-                    response.json({ token });
                     response.end(JSON.stringify({ message: 'Inscription réussie', token }));
                 }
 
@@ -230,7 +279,7 @@ async function manageRequest(request, response) {
                 if (passwordValid) {
                     const token = jwt.sign({ email: data.email }, 'votre_cle_secrete');
                     response.writeHead(200, { 'Content-Type': 'application/json' });
-                    response.end(JSON.stringify({ token }));W
+                    response.end(JSON.stringify({ token }));
 
                 } else {
                 response.writeHead(403, { 'Content-Type': 'application/json' });
@@ -248,10 +297,3 @@ async function manageRequest(request, response) {
 
 connectToDb().catch(console.error);
 */
-
-
-
-
-
-
-
