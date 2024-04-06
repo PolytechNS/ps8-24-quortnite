@@ -1,33 +1,3 @@
-<<<<<<< HEAD
-{
-  "name": "ps8",
-  "version": "1.0.0",
-  "type": "module",
-  "description": "",
-  "main": "back/index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node ./back/index.js"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/benjaminvella/ps8.git"
-  },
-  "author": "Benjamin Vella",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/benjaminvella/ps8/issues"
-  },
-  "homepage": "https://github.com/benjaminvella/ps8#readme",
-  "dependencies": {
-    "bcrypt": "^5.1.1",
-    "bcryptjs": "^2.4.3",
-    "jsonwebtoken": "^9.0.2",
-    "mongodb": "6.3",
-    "socket.io": "^4.7.5"
-  }
-}
-=======
 {
   "name": "ps8",
   "version": "1.0.0",
@@ -58,4 +28,4 @@
 
   "type": "module"
 }
->>>>>>> dev_social2
+
