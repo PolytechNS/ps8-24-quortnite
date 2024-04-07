@@ -2,6 +2,38 @@ main {
     display: flex;
     flex-direction: column;
 }
+@font-face {
+    font-family: 'Burbank'; /* Choisissez un nom pour votre police */
+    src: url('../data/font/BurbankBigCondensedBlack.otf') format('opentype');
+    /* Ajoutez des déclarations supplémentaires si nécessaire */
+}
+
+
+body {
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+    background-image: url('../data/images/BlueBackground.png'); /* Remplacez par le chemin de votre image */
+    background-size: cover; /* Ajuste la taille de l'image pour couvrir l'ensemble de l'élément */
+    background-position: center; /* Centre l'image horizontalement et verticalement */
+    background-repeat: no-repeat; /* Évite la répétition de l'image */
+}
+
+.page-title {
+    font-family:'Burbank','arial';
+    color: white;
+    margin: 0;
+    font-size: 3em;
+}
+
+h2{
+    font-size: 3em;
+}
+
+#bottom-content{
+    display: flex;
+    margin-top: 130px;
+}
 
 #users-friends > div > *:first-child,
 #users-pending > div > *:first-child,
