@@ -19,7 +19,7 @@
 <!-- Trois colonnes : une grande colonne centrale et deux colonnes adjacentes plus fines -->
 <div class="main-container">
     <div class="left-column">
-        <img src="../data/images/Huzog.png" alt="character" class="small-image">
+        <img id="characterImage" src="../data/images/Huzog.png" alt="character" class="small-image">
         <div class="orange-box">
             <h3 class="sub-title">Huzog</h3>
         </div>
@@ -63,6 +63,31 @@
 
 <script src="gameMotor.js"></script>
 <script src="../quitGame/quitGame.js"></script>
+<script>
+    // Fonction pour obtenir les paramètres de l'URL
+    function getParameterByName(name, url) {
+        if (!url) url = window.location.href;
+        name = name.replace(/[\[\]]/g, "\\$&");
+        var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+            results = regex.exec(url);
+        if (!results) return null;
+        if (!results[2]) return '';
+        return decodeURIComponent(results[2].replace(/\+/g, " "));
+    }
+
+
+
+    // Vérifier si le paramètre "imported" est présent dans l'URL
+    var imported = getParameterByName('imported');
+    if (imported === 'true') {
+        // Vérifier s'il existe une URL d'image dans le stockage local
+        var imageUrl = localStorage.getItem("imageUrl");
+        if (imageUrl) {
+            // Mettre à jour l'image dans la colonne gauche avec l'URL stockée
+            document.getElementById('characterImage').src = imageUrl;
+        }
+    }
+</script>
 
 </body>
 </html>
