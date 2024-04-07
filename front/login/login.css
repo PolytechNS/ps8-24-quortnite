@@ -28,6 +28,13 @@ main {
     margin: 0 20px 20px;
 }
 
+.container {
+    text-align: center;
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
 #button-container, form {
     display: flex;
     flex-direction: column;
@@ -129,7 +136,6 @@ header > .top-page {
 
 #login-username::placeholder,#login-password::placeholder   {
     color: rgb(97, 97, 97);
-    margin-left: 10px;
 }
 
 p{
