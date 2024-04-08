@@ -30,9 +30,9 @@ h2{
     font-size: 3em;
 }
 
-#bottom-content{
+#friends-main{
     display: flex;
-    margin-top: 130px;
+    margin-top: 150px;
 }
 
 #users-friends > div > *:first-child,
