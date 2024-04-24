@@ -6,15 +6,6 @@ FROM node:18-slim
 WORKDIR /usr/src/app
 
 # Copie des fichiers nécessaires pour l'application (par exemple package.json)
-
-# Utilisation de l'image officielle Node.sockets version slim
-
-FROM node:18-slim
-
-# Création du répertoire de travail de l'application
-WORKDIR /usr/src/app
-
-# Copie des fichiers nécessaires pour l'application (par exemple package.json)
 COPY package*.json ./
 
 
@@ -30,3 +21,4 @@ EXPOSE 8000
 
 # Commande pour démarrer l'application
 CMD ["npm", "start"]
+

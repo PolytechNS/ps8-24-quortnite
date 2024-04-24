@@ -1,4 +1,7 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> dev
 body, html {
     height: 100%;
     margin: 0;
@@ -8,7 +11,11 @@ body, html {
 
 @font-face {
     font-family: 'Burbank'; /* Choisissez un nom pour votre police */
+<<<<<<< HEAD
     src: url('../files/BurbankBigCondensedBlack.otf') format('opentype');
+=======
+    src: url('../data/font/BurbankBigCondensedBlack.otf') format('opentype');
+>>>>>>> dev
     /* Ajoutez des déclarations supplémentaires si nécessaire */
 }
 
@@ -16,12 +23,22 @@ body {
     justify-content: center;
     height: 100vh;
     margin: 0;
+<<<<<<< HEAD
     background-image: url('../files/BlueBackground.png'); /* Remplacez par le chemin de votre image */
+=======
+    background-image: url('../data/images/BlueBackground.png'); /* Remplacez par le chemin de votre image */
+>>>>>>> dev
     background-size: cover; /* Ajuste la taille de l'image pour couvrir l'ensemble de l'élément */
     background-position: center; /* Centre l'image horizontalement et verticalement */
     background-repeat: no-repeat; /* Évite la répétition de l'image */
 }
 
+<<<<<<< HEAD
+=======
+head{
+    display: flex;
+}
+>>>>>>> dev
 
 
 .container {
@@ -42,7 +59,11 @@ body {
 .title {
     text-align: center;
     font-family:'Burbank','arial';
+<<<<<<< HEAD
     font-size: 5rem;
+=======
+    font-size: 3rem;
+>>>>>>> dev
     margin: 0;
     padding: 0rem;
     color:white;
@@ -127,6 +148,7 @@ h1 {
     .menu {
         grid-template-columns: 1fr; /* Une colonne pour les petits écrans */
     }
+<<<<<<< HEAD
 =======
 body, html {
     height: 100%;
@@ -258,3 +280,7 @@ h1 {
     }
 >>>>>>> dev_social2
 }
+=======
+}
+
+>>>>>>> dev

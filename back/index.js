@@ -1,68 +1,4 @@
 // The http module contains methods to handle http queries.
-import http from 'http';
-import { Server as SocketIO } from 'socket.io';
-import { MongoClient } from "mongodb";
-import jwt from "jsonwebtoken";
-
-
-
-// Let's import our logic.
-//import fileQuery from './queryManagers/front.js';
-import apiQuery from './queryManagers/api.js';
-import AuthRoutes from './routes/AuthRoutes.js';
-import UserModel from './models/userModel.js';
-
-const argument = process.argv[2];
-
-// Connexion à la base de données MongoDB
-let uri;
-if (argument === "dev") {
-    console.log("dev");
-    uri = "mongodb://root:example@localhost:27017/";
-} else {
-    console.log("prod");
-    uri = "mongodb://root:example@localhost:27017/";
-}
-
-const client = new MongoClient(uri, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    serverSelectionTimeoutMS: 5000 // Timeout after 5s instead of 30s
-});
-
-const host = '0.0.0.0';
-const port = 8000;
-
-const server = http.createServer(function (request, response) {
-    let filePath = request.url.split("/").filter(function (elem) {
-        return elem !== "..";
-    });
-
-    try {
-        if (filePath[1] === "api") {
-            apiQuery.manage(request, response);
-        } else {
-            //fileQuery.manage(request, response);
-        }
-    } catch (error) {
-        console.log(`error while processing ${request.url}: ${error}`);
-        response.statusCode = 400;
-        response.end(`Something in your request (${request.url}) is strange...`);
-    }
-});
-
-const io = new SocketIO(server, {
-    cors: {
-        origin: "http://localhost:8000",
-        methods: ["GET", "POST"],
-        allowedHeaders: ["my-custom-header"],
-        credentials: true
-    }
-});
-
-
-//const gameNamespace = io.of('/api/game');
-// The http module contains methods to handle http queries.
 //const http = require('http')
 import * as http from 'http';
 
@@ -90,8 +26,8 @@ import * as http from 'http';
 // const client = new MongoClient(uri);
 //
 //
- const host = '0.0.0.0';
- const port = 8000;
+const host = '0.0.0.0';
+const port = 8000;
 
 
 
@@ -107,7 +43,8 @@ import {jsonValidator} from "./util/jsonValidator.js";
 import connectedPlayer from "./socket/PermanentSocketPlayers.js";
 import ConnectedPlayers from "./socket/ConnectedPlayers.js";
 import chatManager from "./socket/chatManager.js";
-
+import GameDb from './database/gamedb.js';
+import Onlinedb from "./database/onlinedb.js";
 
 
 
@@ -188,7 +125,8 @@ const io = new Server(httpServer, {
 
 
 
-const gameSocket = io.of("/api/game");
+const gameSocket = io.of("/api/games");
+const onlineSocket = io.of("/api/gameOnline");
 const chatSocket = io.of("/api/chat");
 const permanentSocket = io.of("/api/permanent")
 
@@ -233,6 +171,10 @@ gameSocket.use((socket, next) => {
 
 chatSocket.use((socket, next) => {
     authenticate(socket, next);
+});
+
+onlineSocket.use((socket,next)=>{
+    authenticate(socket,next);
 });
 
 
@@ -295,6 +237,38 @@ permanentSocket.on('connection', (socket) => {
 });
 
 
+gameSocket.on('connection', (socket) => {
+    console.log('Un client est connecté au namespace /api/games');
+    socket.on('saveGameState', async (gameState) => {
+        console.log("Je communique bien pour sauvegarder");
+        try{
+            const gameId = await GameDb.saveGameState(gameState);
+            socket.emit('gameStateSaved', { gameId }); // Informer le client que l'état du jeu a été sauvegardé avec succès
+            gameSocket.emit('updateGameState', gameState); // Mettre à jour tous les clients avec le nouvel état du jeu
+        } catch (error) {
+            console.error('Erreur lors de la sauvegarde de l\'état du jeu:', error);
+            socket.emit('error', 'Erreur lors de la sauvegarde de l\'état du jeu');
+        }
+    });
+
+    socket.on('requestGameState', async (gameId) => {
+        try {
+            const gameState = await GameDb.getGameState(gameId);
+            if (gameState) {
+                socket.emit('gameState', gameState);
+            } else {
+                socket.emit('error', 'Jeu introuvable');
+            }
+        } catch (error) {
+            console.error('Erreur lors de la récupération de l\'état du jeu:', error);
+            socket.emit('error', 'Erreur lors de la récupération de l\'état du jeu');
+        }
+    });
+});
+
+
+
+
 let chatRooms = [];
 chatSocket.on('connection', (socket) => {
     console.log("Socket id chat : " + socket.id);
@@ -352,4 +326,203 @@ chatSocket.on('connection', (socket) => {
         console.log("Socket id chat : " + socket.id + " disconnected");
     });
 });
+
+let waitingPlayer = null; // ID du socket du joueur en attente
+
+//1V1 ONLINE
+const socketRoomMap = {};
+onlineSocket.on('connection', (socket) => {
+    console.log('Un joueur s\'est connecté au jeu en ligne.');
+
+    // Matchmaking: Jumeler les joueurs
+    socket.on('joinGame', async () => {
+        const {roomId, state,playerRole} = await Onlinedb.createOrJoinRoom(socket.id);
+
+        socketRoomMap[socket.id] = roomId;
+
+        if (state === 'waiting') {
+            // Jumeler le joueur actuel avec le joueur en attente
+            socket.join(roomId);
+            socket.emit('waitingForOpponent', 'En attente d\'un adversaire...');
+        } else if (state === 'active') {
+            socket.join(roomId);
+            socket.emit('gameStart', { roomId: roomId, role: 'player1', message: 'La partie commence !' });
+            socket.to(roomId).emit('opponentJoined', {
+                message: 'Votre adversaire a rejoint. Préparez-vous !',
+                role: 'player2', // Assurez-vous que cette valeur est correctement définie
+                roomId: roomId
+            });
+        }
+    });
+
+    socket.on('selectInitialPosition', async ({ cellIndex, playerRole, roomId }) => {
+        const room = await Onlinedb.getRoomState(roomId);
+        if (!room) {
+            console.error(`Aucune salle trouvée avec l'ID: ${roomId}`);
+            return;
+        }
+
+        // Convertir cellIndex en coordonnées x et y
+        const x = Math.floor(cellIndex / 17);
+        const y = cellIndex % 17;
+        1
+        console.log("x: " +x + "y : "+ y);
+
+        // Vérifier si la sélection de position est valide
+        let isValidPosition = false;
+        let errorMessage = "";
+
+        if (playerRole === 'player1' && x === 0) {
+            isValidPosition = true;
+        } else if (playerRole === 'player2' && x ===16) { // Assurez-vous que cette condition corresponde à votre dernière ligne
+            isValidPosition = true;
+        } else {
+            errorMessage = playerRole === 'player1' ?
+                "Veuillez cliquer sur une case de la première ligne." :
+                "Veuillez cliquer sur une case de la dernière ligne.";
+        }
+
+        if (isValidPosition) {
+            // Mettre à jour l'état du jeu avec la position initiale du joueur
+            const gameState = await Onlinedb.getGameState(roomId);
+            await Onlinedb.updateGameState(roomId, {
+                ...gameState,
+                playerPositions: {
+                    ...gameState.playerPositions,
+                    [playerRole]: { x, y }
+                }
+            });
+            console.log(gameState.playerPositions);
+            onlineSocket.in(roomId).emit('updateGameState', gameState);
+            console.log("Initial gameState suceed : "+ gameState);
+            // Passer au tour suivant en utilisant switchTurn
+            await switchTurn(roomId);
+        } else {
+            // Envoyer un message d'erreur au joueur
+            socket.emit('invalidInitialPosition', errorMessage);
+        }
+    });
+
+
+    socket.on('playerAction', async ({roomId, action}) => {
+        console.log("playerMove ");
+        // Valider et traiter l'action ici...
+        const gameState = await Onlinedb.getGameState(roomId);
+        // L'objet updatedGameState devrait être préparé ici après la validation
+        let updatedGameState = {...gameState};
+
+        if (action.type === 'move') {
+            console.log("Un mouvement à été demandé");
+            const { cellIndex, player: playerRole } = action;
+            const newPosition = {
+                x: Math.floor(cellIndex/17),
+                y: cellIndex % 17
+            };
+            console.log("est ce bien ? :  " + gameState.playerPositions[playerRole]);
+            let isValidMove = await Onlinedb.isMoveValid(gameState.playerPositions[playerRole],newPosition);
+            console.log("isValidMove ? : " + isValidMove);
+            if (isValidMove) {
+                console.log("Le mouvement est valide ! ");
+                gameState.playerPositions[playerRole] = newPosition;
+                await Onlinedb.updateGameState(roomId, updatedGameState);
+                onlineSocket.to(roomId).emit('updateGameState', updatedGameState);
+                await switchTurn(roomId);
+                // Appliquer le déplacement dans updatedGameState si nécessaire
+            }
+        } else if (action.type === 'placeWall') {
+            console.log("Placement d'un mur demandé");
+            const {cellIndex, wallType, player} = action.wall;
+            let isWallPlacementValid = Onlinedb.validateWallPlacement(gameState, cellIndex, wallType, player);
+            console.log("isWallPlacementValid ? : " + isWallPlacementValid);
+            if (isWallPlacementValid) {
+                console.log("Le placement du mur est valide !");
+                updatedGameState.walls.push({cellIndex, wallType});
+                await Onlinedb.updateGameState(roomId, updatedGameState);
+                onlineSocket.to(roomId).emit('updateGameState', updatedGameState);
+                await switchTurn(roomId);
+            } else {
+                onlineSocket.to(roomId).emit('invalidWallPlacement', "Placement de mur invalide.");
+            }
+        }
+    });
+
+    socket.on('disconnect', async () => {
+        const roomId = socketRoomMap[socket.id];
+        // Vérifier l'état de la room et prendre des mesures en conséquence
+        if (roomId) {
+            // Obtenez l'état de la room ici et décidez des actions appropriées
+            const room = await Onlinedb.getRoomState(roomId);
+            // Supposons que cette fonction renvoie { state: 'waiting' } ou { state: 'active' }
+
+            if (room.state === 'waiting') {
+                await Onlinedb.deleteRoom(roomId);
+                // Assurez-vous de nettoyer après la suppression
+                delete socketRoomMap[socket.id];
+            } else if (room.state === 'active') {
+                socket.to(roomId).emit('opponentLeft', 'Votre adversaire a quitté la partie.');
+                await Onlinedb.endGame(roomId, socket.id);
+                // Informez l'autre joueur, nettoyez la room, etc.
+            }
+        }
+    });
+
+    socket.on('playerPlaceWall', (data) => {
+        const roomId = socketRoomMap[socket.id];
+        // Valider le placement du mur et mettre à jour l'état du jeu
+        const validWallPlacement = validateWallPlacement(data); // Cette fonction doit être définie
+        if (validWallPlacement) {
+            // Mettre à jour l'état du jeu
+            const updatedGameState = updateGameState(data);
+            // Envoyer la mise à jour à tous les joueurs dans la room
+            onlineSocket.in(roomId).emit('updateGameState', updatedGameState);
+        } else {
+            // Envoyer un message d'erreur au joueur qui a tenté de placer le mur
+            socket.emit('invalidWallPlacement', 'Placement de mur invalide.');
+        }
+    });
+
+});
+
+function getPlayerRoleByIndex(players, currentPlayerIndex) {
+    // Si l'index du joueur actuel est 0, alors c'est le rôle 'player1', sinon 'player2'.
+    // Ceci est basé sur la supposition que l'ordre des joueurs dans le tableau est [player1, player2].
+    return currentPlayerIndex === 0 ? 'player1' : 'player2';
+}
+
+async function switchTurn(roomId) {
+    try {
+        const room = await Onlinedb.getRoomState(roomId);
+        if (!room) {
+            throw new Error(`Aucune salle trouvée avec l'ID: ${roomId}`);
+        }
+
+        // Calculer l'index du prochain joueur
+        const nextPlayerIndex = (room.currentPlayerIndex + 1) % room.players.length;
+
+        // Mettre à jour l'index du joueur actuel dans l'état de la salle
+        await Onlinedb.updateRoomState(roomId, { currentPlayerIndex: nextPlayerIndex });
+
+        // Récupérer l'état mis à jour de la salle
+        const updatedRoom = await Onlinedb.getRoomState(roomId);
+
+        // Déterminer le rôle du joueur actuel basé sur l'index mis à jour
+        const currentPlayerRole = getPlayerRoleByIndex(updatedRoom.players, updatedRoom.currentPlayerIndex);
+
+        // Récupérer l'état complet du jeu, y compris les positions des joueurs, les murs, etc.
+        const gameState = await Onlinedb.getGameState(roomId);
+
+        // S'assurer que l'état du jeu inclut le joueur actuel correct
+        gameState.currentPlayer = currentPlayerRole;
+
+        // Envoyer l'état du jeu mis à jour à tous les clients dans la salle
+        onlineSocket.in(roomId).emit('updateGameState', gameState);
+
+        console.log(`Tour changé à ${currentPlayerRole} dans la salle ${roomId}`);
+    } catch (error) {
+        console.error(`Erreur dans switchTurn pour la salle ${roomId}:`, error);
+    }
+
+}
+
+
 

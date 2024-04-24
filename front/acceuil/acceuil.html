@@ -1,20 +1,144 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> dev
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quortnite - Accueil</title>
+<<<<<<< HEAD
     <link rel="stylesheet" href="acceuil-styles.css">
 </head>
 <body>
 <div class="container">
+=======
+
+    <link rel="stylesheet" href="acceuil-styles.css">
+
+
+    <script src="../sockets/socket.io.js"></script>
+
+    <link href="../commonCSS/common.css" rel="stylesheet">
+    <script src="../util/guards/guard.js" type="module"></script>
+    <script src="../util/updateUsernameDiv.js" type="module"></script>
+    <script src="../menu/burgermenu.js" type="module"></script>
+    <script src="../menu/burgermenu_open_close_button.js" type="module"></script>
+    <script src="../chat/chat.js" type="module"></script>
+
+    <script src="home.js" type="module"></script>
+    <link href="home.css" rel="stylesheet">
+
+
+
+
+</head>
+<body>
+
+<header>
+    <burger-menu></burger-menu>
+</header>
+
+<!--<header>
+    <burger-menu-open-close></burger-menu-open-close>
+    <div class="top-page">
+        <div class="top-corner-content" id="header-center-div"></div>
+        <div class="top-corner-content" id="username"></div>
+    </div>
+</header>-->
+
+
+<div id="bottom-content">
+    <main>
+        <h2 id="offline-info">Vous êtes hors ligne !</h2>
+
+        <div class="container">
+
+            <h1>QUORTNITE</h1>
+            <div class="menu">
+                <button class="btn" id="shop">
+                    <img src="../data/images/boutique.png" alt="Icone Boutique">
+                    <span>BOUTIQUE</span>
+                    <script>
+                        document.getElementById('shop').addEventListener('click', function() {
+                            window.location.href = '../html/boutique.html';
+                        });
+                    </script>
+                </button>
+
+                <button class="btn" id="play">
+                    <span>JOUER</span>
+                    <script>
+                        document.getElementById('play').addEventListener('click', function() {
+                            window.location.href = '../gameChoice/gameChoice.html';
+                        });
+                    </script>
+                </button>
+
+
+                <button class="btn" id="rules">
+                    <img src="../data/images/regles.png" alt="Icone Regles">
+                    <span>RÈGLES</span>
+                    <script>
+                        document.getElementById('rules').addEventListener('click', function() {
+                            window.location.href = '../html/regles.html';
+                        });
+                    </script>
+                </button>
+
+                <button class="btn" id="stats">
+                    <img src="../data/images/stats.png" alt="Icone Stats">
+                    <span>STATS</span>
+                    <script>
+                        document.getElementById('stats').addEventListener('click', function() {
+                            window.location.href = '../ranking/index.html';
+                        });
+                    </script>
+                </button>
+
+                <button class="btn" id="friends">
+                    <img src="../data/images/amis.png" alt="Icone Amis">
+                    <span>FRIENDS</span>
+                    <script>
+                        document.getElementById('friends').addEventListener('click', function() {
+                            window.location.href = '../friends/index.html';
+                        });
+                    </script>
+
+                </button>
+
+                <button class="btn" id="settings">
+                    <img src="../data/images/reglages.png" alt="Icone Reglages">
+                    <span>RÉGLAGES</span>
+                    <script>
+                        document.getElementById('settings').addEventListener('click', function() {
+                            window.location.href = '../html/settings.html';
+                        });
+                    </script>
+                </button>
+
+            </div>
+
+        </div>
+    </main>
+    <chat-global></chat-global>
+</div>
+
+<!--<div class="container">
+
+
+>>>>>>> dev
     <h1>QUORTNITE</h1>
 
     <div class="menu">
 
         <button class="btn" id="shop">
+<<<<<<< HEAD
             <img src="../files/boutique.png" alt="Icone Boutique">
+=======
+            <img src="../data/images/boutique.png" alt="Icone Boutique">
+>>>>>>> dev
             <span>BOUTIQUE</span>
         </button>
 
@@ -22,22 +146,35 @@
             <span>JOUER</span>
             <script>
                 document.getElementById('play').addEventListener('click', function() {
+<<<<<<< HEAD
                     window.location.href = 'ai-or-local-game-choice.html';
+=======
+                    window.location.href = '../game/game.html';
+>>>>>>> dev
                 });
             </script>
         </button>
 
         <button class="btn" id="rules">
+<<<<<<< HEAD
             <img src="../files/regles.png" alt="Icone Regles">
+=======
+            <img src="../data/images/regles.png" alt="Icone Regles">
+>>>>>>> dev
             <span>RÈGLES</span>
         </button>
 
         <button class="btn" id="stats">
+<<<<<<< HEAD
             <img src="../files/stats.png" alt="Icone Stats">
+=======
+            <img src="../data/images/stats.png" alt="Icone Stats">
+>>>>>>> dev
             <span>STATS</span>
         </button>
 
         <button class="btn" id="friends">
+<<<<<<< HEAD
             <img src="../files/amis.png" alt="Icone Amis">
             <span>FRIENDS</span>
         </button>
@@ -197,3 +334,27 @@
 </body>
 </html>
 >>>>>>> dev_social2
+=======
+            <img src="../data/images/amis.png" alt="Icone Amis">
+            <span>FRIENDS</span>
+
+        </button>
+
+        <button class="btn" id="settings">
+            <img src="../data/images/reglages.png" alt="Icone Reglages">
+            <span>RÉGLAGES</span>
+        </button>
+
+    </div>
+
+</div>-->
+
+<iframe src="../html/template.html" style="display: none;"></iframe>
+
+
+
+
+
+</body>
+</html>
+>>>>>>> dev

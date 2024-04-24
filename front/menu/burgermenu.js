@@ -45,9 +45,9 @@ burgerMenuTemplate.innerHTML = `
         <a class="nav-link" id="notifications" href="${BASE_URL_PAGE}${NOTIFICATIONS_PAGE_URL}" >
             <img alt="Notifications" src="${notifications}">
         </a>
-        <a class="nav-link" id="friends" href="${BASE_URL_PAGE}${FRIENDS_URL}">
+   <!--     <a class="nav-link" id="friends" href="${BASE_URL_PAGE}${FRIENDS_URL}">
             <img alt="Amis" src="${friends}">
-        </a>
+        </a> -->
         <a class="nav-link" id="addFriends" href="${BASE_URL_PAGE}${SEARCH_USERS_URL}" >
             <img alt="Ajouter un ami" src="${addFriend}">
         </a>
@@ -57,12 +57,12 @@ burgerMenuTemplate.innerHTML = `
         <a class="nav-link" id="other" href="${BASE_URL_PAGE}${OTHER_MENU_URL}" >
             <img alt="Autres" src="${other}">
         </a>
-        <a class="nav-link" id="ranking" href="${BASE_URL_PAGE}${RANKING_URL}">
-            <img alt="Classement" src="${ranking}">
+  <!--      <a class="nav-link" id="ranking" href="${BASE_URL_PAGE}${RANKING_URL}">
+            <img alt="Classement" src="${ranking}">  
         
-        </a>
+        </a>-->
         <a class="nav-link" id="logout-button" href="${BASE_URL_PAGE}${LOGIN_URL}">
-            <button>Se déconnecter</button>
+            <img alt="se deconnecter" src="${logout}">
         </a>   
     </div>
     <div id="menu-buttons">
@@ -75,9 +75,9 @@ burgerMenuTemplate.innerHTML = `
         <a class="nav-link" id="notifications-button" href="${BASE_URL_PAGE}${NOTIFICATIONS_PAGE_URL}" >
             <button>Notifications</button>
         </a>
-        <a class="nav-link" id="friends-button" href="${BASE_URL_PAGE}${FRIENDS_URL}">
-            <button>Mes amis</button>
-        </a>
+     <!--     <a class="nav-link" id="friends-button" href="${BASE_URL_PAGE}${FRIENDS_URL}">
+            <button>Mes amis</button> 
+        </a>-->
         <a class="nav-link" id="addFriends-button" href="${BASE_URL_PAGE}${SEARCH_USERS_URL}" >
             <button>Ajouter un ami</button>
         </a>
@@ -87,9 +87,9 @@ burgerMenuTemplate.innerHTML = `
         <a class="nav-link" id="other-button" href="${BASE_URL_PAGE}${OTHER_MENU_URL}" >
             <button>Autres</button>
         </a>
-        <a class="nav-link" id="ranking-button" href="${BASE_URL_PAGE}${RANKING_URL}">
+       <!--  <a class="nav-link" id="ranking-button" href="${BASE_URL_PAGE}${RANKING_URL}">
             <button>Classement</button>
-        </a>       
+        </a>    -->   
         
         <a class="nav-link" id="logout-button" href="${BASE_URL_PAGE}${LOGIN_URL}">
             <button>Se déconnecter</button>
@@ -107,10 +107,7 @@ class Burgermenu extends HTMLElement {
     }
 
     connectedCallback() {
-        // this.shadowRoot.getElementById("logout").addEventListener("click", () => {
-        //     localStorage.clear();
-        // });
-
+        
         let chat = this.shadowRoot.getElementById("chat");
         chat.style.cursor = "pointer";
         chat.addEventListener("click", () => {
@@ -121,17 +118,5 @@ class Burgermenu extends HTMLElement {
 
 }
 
-// this.shadowRoot.addEventListener("deviceready", onDeviceReady, false);
-// function onDeviceReady() {
-//     console.log("device ready");
-//     let accueil = this.shadowRoot.getElementById("accueil");
-//     let notifications = this.shadowRoot.getElementById("notifications");
-//     accueil.addEventListener("click", () => {
-//         screen.orientation.unlock();
-//     });
-//     notifications.addEventListener("click", () => {
-//         screen.orientation.unlock();
-//     });
-// }
 
 window.customElements.define('burger-menu', Burgermenu);

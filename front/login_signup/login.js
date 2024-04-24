@@ -1,4 +1,8 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+import {parseJwt} from "../util/jwtParser";
+>>>>>>> dev
 
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -56,6 +60,14 @@ function submitForm(form, url,type) {
             if (type === 'inscription') {
                 let form = document.querySelector(".Form-box");
 
+<<<<<<< HEAD
+=======
+                let parsedJwt = parseJwt(jwtToken);
+
+                let email=parsedJwt.email;
+
+
+>>>>>>> dev
                 console.log('Inscription réussie:', data);
                 alert("Inscription réussie. Vous allez être redirigé vers la page de connexion.");
                 form.classList.remove("change-form");
@@ -74,6 +86,7 @@ function submitForm(form, url,type) {
             console.error('Error:', error);
         });
 }
+<<<<<<< HEAD
 =======
 import {parseJwt} from "../util/jwtParser";
 
@@ -157,3 +170,5 @@ function submitForm(form, url,type) {
         });
 }
 >>>>>>> dev_social2
+=======
+>>>>>>> dev

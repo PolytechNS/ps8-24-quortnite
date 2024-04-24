@@ -1,7 +1,7 @@
 
 // Main method, exported at the end of the file. It's the one that will be called when a REST request is received.
 import {BODY, PARAMS, sendResponse, urlNotFound} from "./utilsApi.js";
-import {userLogIn, userSignUp} from "./user/accountApi.js";;
+import {userLogIn, userSignUp} from "./user/accountApi.js";
 import {friendsApiDelete, friendsApiGet, friendsApiPost} from "./friends/apiFriends.js";
 import {usersApiGet} from "./user/usersApi.js";
 import {notificationsApiDelete, notificationsApiGet} from "./notification/apiNotifications.js";
@@ -297,3 +297,4 @@ async function manageRequest(request, response) {
 
 connectToDb().catch(console.error);
 */
+

@@ -1,4 +1,7 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> dev
 {
   "name": "node_quickstart",
   "version": "1.0.0",
@@ -9,6 +12,7 @@
   },
   "keywords": [],
   "author": "",
+<<<<<<< HEAD
   "license": "ISC"
 }
 =======
@@ -29,3 +33,11 @@
   }
 }
 >>>>>>> dev_social2
+=======
+  "license": "ISC",
+  "dependencies": {
+    "jsonwebtoken": "^9.0.2",
+    "socket.io": "^4.7.5"
+  }
+}
+>>>>>>> dev
